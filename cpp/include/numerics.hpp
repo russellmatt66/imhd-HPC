@@ -25,28 +25,28 @@ void computefluxes_x(imhdFluid& imhdFluid) {
                 e = imhdFluid.e(i,j,k);
                 
                 // x-directed flux of mass density
-                xfluxes_[0](i,j,k) = rho_u; 
+                imhdFluid.xflux_rho(i,j,k) = rho_u; 
                 
                 // x-directed flux of x-momentum density
-                xfluxes_[1](i,j,k) = (rho_u * rho_u) / rho - B_x * B_x + p + BdotB / 2.0;
+                imhdFluid.xflux_rhou(i,j,k) = (rho_u * rho_u) / rho - B_x * B_x + p + BdotB / 2.0;
                 
                 // x-directed flux of y-momentum density
-                xfluxes_[2](i,j,k) = (rho_v * rho_u) / rho - B_y * B_x;
+                imhdFluid.xflux_rhov(i,j,k) = (rho_v * rho_u) / rho - B_y * B_x;
                 
                 // x-directed flux of z-momentum density
-                xfluxes_[3](i,j,k) = (rho_w * rho_u) / rho - B_x * B_z;
+                imhdFluid.xflux_rhow(i,j,k) = (rho_w * rho_u) / rho - B_x * B_z;
                 
                 // x-directed flux of B_{x} 
-                xfluxes_[4](i,j,k) = 0.0; 
+                imhdFluid.xflux_Bx(i,j,k) = 0.0; 
                 
                 // x-directed flux of B_{y}
-                xfluxes_[5](i,j,k) = (rho_v / rho) * B_x - rho_u / rho * B_y;
+                imhdFluid.xflux_By(i,j,k) = (rho_v / rho) * B_x - rho_u / rho * B_y;
                 
                 // x-directed flux of B_{z}
-                xfluxes_[6](i,j,k) = rho_w / rho * B_x - rho_u / rho * B_z;
+                imhdFluid.xflux_Bz(i,j,k) = rho_w / rho * B_x - rho_u / rho * B_z;
                 
                 // x-directed flux of energy  
-                xfluxes_[7](i,j,k) = (rho_u / rho) * (e + p + BdotB / 2.0) - Bdotv*B_x;  
+                imhdFluid.xflux_e(i,j,k) = (rho_u / rho) * (e + p + BdotB / 2.0) - Bdotv*B_x;  
             }
         }
     }
@@ -56,6 +56,9 @@ void computefluxes_y(imhdFluid& imhdFluid){
     
 }
 
+void computefluxes_z(imhdFluid& imhdFluid){
+    
+}
 // Compute intermediate fluxes
 
 #endif
