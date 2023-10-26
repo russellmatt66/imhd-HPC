@@ -57,8 +57,19 @@ void computefluxes_y(imhdFluid& imhdFluid){
 }
 
 void computefluxes_z(imhdFluid& imhdFluid){
+
+}
+
+// Compute intermediate fluxes
+void int_computefluxes_x(imhdFluid& imhdFluid){
+
+}
+
+void int_computefluxes_y(imhdFluid& imhdFluid){
     
 }
-// Compute intermediate fluxes
 
+void int_computefluxes_z(imhdFluid& imhdFluid){
+    
+}
 #endif
