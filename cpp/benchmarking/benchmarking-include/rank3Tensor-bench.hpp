@@ -1,9 +1,8 @@
-#ifndef RANK3TENS
-#define RANK3TENS
+#ifndef RANK3TENS_BENCH
+#define RANK3TENS_BENCH
 
 #include<cmath>
 #include<vector>
-
 
 class rank3Tensor {
 	public:
