@@ -1,5 +1,5 @@
-#ifndef IMHDFLUID
-#define IMHDFLUID
+#ifndef IMHDFLUID_DEBUG
+#define IMHDFLUID_DEBUG
 
 #include <vector>
 
