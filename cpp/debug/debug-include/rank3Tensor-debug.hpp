@@ -1,5 +1,5 @@
-#ifndef RANK3TENS
-#define RANK3TENS
+#ifndef RANK3TENS_DEBUG
+#define RANK3TENS_DEBUG
 
 #include<cmath>
 
