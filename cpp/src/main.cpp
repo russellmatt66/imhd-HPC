@@ -18,10 +18,12 @@
 using namespace std;
 using ParameterValue = std::variant<size_t, double, string>;
 
+// Function prototypes
 bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, string &filename);
 void clearDataDirectory(const string &directoryPath);
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 
+// Main
 int main(){
     ofstream simlog;
     simlog.open("../imhdlog.txt");
