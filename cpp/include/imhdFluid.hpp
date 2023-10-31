@@ -20,9 +20,10 @@ class imhdFluid {
             N_(N) // number of elements to data cube side 
             {}
         
-        // Spaghetti for accessing all the member variables beyond this point
+        // Spaghetti for accessing all the member variables beyond this point.
         // In scientific software development, there is a tradeoff between elegance and correctness that must sometimes be made. 
-        // It is far more important that the code be easy to debug, than that it be the cleverest, most compact set of statements ever written.  
+        // It is far more important that the code be easy to debug, than that it be the cleverest, most compact set of statements ever written. 
+         
         // Fluid variable accessors
         double& imhdVar(size_t iv, size_t i, size_t j, size_t k) { return variables_[iv](i,j,k); }
         const double& imhdVar(size_t iv, size_t i, size_t j, size_t k) const { return variables_[iv](i,j,k); }
