@@ -15,21 +15,32 @@
 #include "../debug-include/numerics-debug.hpp"
 #include "../debug-include/fluxFunctions-debug.hpp"
 
-using namespace std;
+// Don't want to use "using namespace std;"
+using std::string;
+using std::ofstream;
+using std::ifstream;
+using std::endl;
+using std::unordered_map;
+using std::get;
+using std::cerr;
+// using std::filesystem;
+
 using ParameterValue = std::variant<size_t, double, string>;
 
+// Function prototypes
 bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, string &filename);
-void clearDataDirectory(const string &directoryPath);
+// void clearDataDirectory(const string &directoryPath); 
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 
+// Main
 int main(){
     ofstream simlog;
-    simlog.open("../debuglog.txt");
+    simlog.open("../debug-build/debuglog.txt");
     simlog << "Beginning simulation ...\n";
 
     // Parse input file
     simlog << "Parsing input file ...\n";
-    unordered_map<string, ParameterValue> inputHash = parseInputFile("imhd.inp");
+    unordered_map<string, ParameterValue> inputHash = parseInputFile("../debug-build/imhd.inp");
 
     size_t N = get<size_t>(inputHash["N"]);
     size_t Nt = get<size_t>(inputHash["Nt"]);

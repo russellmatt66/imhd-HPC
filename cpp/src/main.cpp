@@ -1,14 +1,14 @@
 #define _USE_MATH_DEFINES
 
-#include<iostream>
-#include<fstream>
-#include<string>
-#include<experimental/filesystem>
-#include<cmath>
-#include<unordered_map>
-#include<variant>
-
-#include<H5Cpp.h> 
+#include <iostream>
+#include <fstream>
+#include <string>
+// #include <experimental/filesystem>
+#include <cmath>
+#include <unordered_map>
+#include <variant>
+#include <stdexcept>
+#include <H5Cpp.h> 
 
 #include "../include/rank3Tensor.hpp"
 #include "../include/imhdFluid.hpp"
@@ -18,25 +18,29 @@
 // Don't want to use "using namespace std;"
 using std::string;
 using std::ofstream;
+using std::ifstream;
 using std::endl;
 using std::unordered_map;
 using std::get;
+using std::cerr;
+// using std::filesystem;
+
 using ParameterValue = std::variant<size_t, double, string>;
 
 // Function prototypes
 bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, string &filename);
-void clearDataDirectory(const string &directoryPath);
+// void clearDataDirectory(const string &directoryPath);
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 
 // Main
 int main(){
     ofstream simlog;
-    simlog.open("../imhdlog.txt");
+    simlog.open("../build/imhdlog.txt");
     simlog << "Beginning simulation ...\n";
 
     // Parse input file
     simlog << "Parsing input file ...\n";
-    unordered_map<string, ParameterValue> inputHash = parseInputFile("imhd.inp");
+    unordered_map<string, ParameterValue> inputHash = parseInputFile("../build/imhd.inp");
 
     size_t N = get<size_t>(inputHash["N"]);
     size_t Nt = get<size_t>(inputHash["Nt"]);
@@ -112,7 +116,7 @@ int main(){
     bool fileFlag;
 
     // Clear data directory of all files before beginning simulation
-    clearDataDirectory(dataPath);
+    // clearDataDirectory(dataPath);
 
     // Write ICs
     simlog << "Writing Initial Conditions.\n";
@@ -128,7 +132,7 @@ int main(){
         simlog << "Advance completed. Writing boundary conditions\n";
         PeriodicBCs(screwPinchSim);
         simlog << "Boundary conditions written.\n";
-        filePath = dataPath + "/FluidVars" + "_timestep_" + to_string(it) + ".h5";  
+        filePath = dataPath + "/FluidVars" + "_timestep_" + std::to_string(it) + ".h5";  
         simlog << "Writing data to file " << filePath << endl;
         fileFlag = createHDF5File(screwPinchSim,ComputationalVolume,filePath);
         simlog << "Data successfully written out.\n";
@@ -285,15 +289,14 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
         if (delimiterPos != string::npos) {
             string paramName = line.substr(0,delimiterPos);
             string paramValueStr = line.substr(delimiterPos + 1);
-
             try {
                 size_t stValue = stoul(paramValueStr);
                 parameters[paramName] = stValue;
-            } catch (const invalid_argument) {
+            } catch (const std::invalid_argument& ia) {
                 try {
                     double dubValue = stod(paramValueStr);
                     parameters[paramName] = dubValue;
-                } catch (const invalid_argument) {
+                } catch (const std::invalid_argument& ia) {
                     parameters[paramName] = paramValueStr;
                 }
             }
@@ -305,10 +308,11 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
 }
 
 // Intended usage is to clear ../data/ before every run
-void clearDataDirectory(const string& directoryPath){
-    fs::path directory(directoryPath);
+// Have to link <filesystem> library - this is a pain for such a small feature
+// void clearDataDirectory(const string& directoryPath){
+//     filesystem::path directory(directoryPath);
 
-    for (const auto& file : fs::directory_iterator(directory)){
-        fs::remove(file);
-    }
-}
+//     for (const auto& file : filesystem::directory_iterator(directory)){
+//         filesystem::remove(file);
+//     }
+// }
