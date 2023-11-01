@@ -8,14 +8,19 @@
 #include<unordered_map>
 #include<variant>
 
-#include<H5cpp.h> 
+#include<H5Cpp.h> 
 
 #include "../include/rank3Tensor.hpp"
 #include "../include/imhdFluid.hpp"
 #include "../include/numerics.hpp"
 #include "../include/fluxFunctions.hpp"
 
-using namespace std;
+// Don't want to use "using namespace std;"
+using std::string;
+using std::ofstream;
+using std::endl;
+using std::unordered_map;
+using std::get;
 using ParameterValue = std::variant<size_t, double, string>;
 
 // Function prototypes
