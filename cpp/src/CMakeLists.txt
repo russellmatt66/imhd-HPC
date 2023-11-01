@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.25)
 project (imhd_HPC C CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+
 set (FIND_HDF_COMPONENTS C CXX HL HLCXX  static)
 find_package (HDF5 NAMES "hdf5" COMPONENTS ${FIND_HDF_COMPONENTS})
 if (HDF5_FOUND)
@@ -15,11 +17,6 @@ else ()
 endif ()
 INCLUDE_DIRECTORIES (${HDF5_INCLUDE_DIR})
 
-# message("HDF5_INCLUDE_DIR = ${HDF5_INCLUDE_DIR}\n")
-
 add_executable (imhd-release main.cpp)
-set_target_properties(imhd-release 
-    PROPERTIES 
-    CXX_STANDARD 17
-    )
-target_link_libraries (imhd-release PRIVATE ${LINK_LIBS})
+
+target_link_libraries (imhd-release PRIVATE ${LINK_LIBS} stdc++fs)

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-// #include <experimental/filesystem>
+#include <experimental/filesystem> // I have gcc 7.5
 #include <cmath>
 #include <unordered_map>
 #include <variant>
@@ -24,12 +24,13 @@ using std::unordered_map;
 using std::get;
 using std::cerr;
 // using std::filesystem;
+namespace fs = std::experimental::filesystem;
 
 using ParameterValue = std::variant<size_t, double, string>;
 
 // Function prototypes
 bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, string &filename);
-// void clearDataDirectory(const string &directoryPath);
+void clearDataDirectory(const string &directoryPath);
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 
 // Main
@@ -116,7 +117,7 @@ int main(){
     bool fileFlag;
 
     // Clear data directory of all files before beginning simulation
-    // clearDataDirectory(dataPath);
+    clearDataDirectory(dataPath);
 
     // Write ICs
     simlog << "Writing Initial Conditions.\n";
@@ -308,11 +309,10 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
 }
 
 // Intended usage is to clear ../data/ before every run
-// Have to link <filesystem> library - this is a pain for such a small feature
-// void clearDataDirectory(const string& directoryPath){
-//     filesystem::path directory(directoryPath);
+void clearDataDirectory(const string& directoryPath){
+    fs::path directory(directoryPath);
 
-//     for (const auto& file : filesystem::directory_iterator(directory)){
-//         filesystem::remove(file);
-//     }
-// }
+    for (const auto& file : fs::directory_iterator(directory)){
+        fs::remove(file);
+    }
+}
