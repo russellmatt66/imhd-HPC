@@ -58,23 +58,40 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename, ofs
 
     string line;
     while (getline(inputFile, line)) {
+        
+        outputFile << "Current line is " << line << endl; 
+
         size_t delimiterPos = line.find('=');
         if (delimiterPos != string::npos) {
             string paramName = line.substr(0,delimiterPos);
             string paramValueStr = line.substr(delimiterPos + 1);
-            try {
-                size_t stValue = stoul(paramValueStr);
-                parameters[paramName] = stValue;
-            } catch (const std::invalid_argument& ia) {
-                try {
-                    double dubValue = stod(paramValueStr);
-                    parameters[paramName] = dubValue;
-                } catch (const std::invalid_argument& ia) {
-                    parameters[paramName] = paramValueStr;
-                }
+            if (paramName == "N" || "Nt"){
+                outputFile << "paramName is " << paramName << endl;
+                outputFile << "paramValueStr is " << paramValueStr << endl;
+                size_t paramValue = stoul(paramValueStr);
+                outputFile << "paramValue is " << paramValue << endl;
+                parameters[paramName] = paramValue;
+                outputFile << paramName << " = " << stoul(paramValueStr) << endl; 
+            } else if (paramName == "dx" || "dt"){
+                outputFile << "paramName is " << paramName << endl;
+                outputFile << "paramValueStr is " << paramValueStr << endl;
+                double paramValue = stod(paramValueStr);
+                outputFile << "paramValue is " << paramValue << endl;
+                parameters[paramName] = paramValue;
+                outputFile << paramName << " = " << paramValue << endl;
             }
         }
     }
+
+    // for (const auto& [key, value] : parameters) {
+    //     outputFile << "paramName: " << key << " paramValue: ";
+        
+    //     std::visit([&outputFile](const auto& paramValue) {
+    //         outputFile << paramValue;
+    //     }, value);
+
+    //     outputFile << endl;
+    // }
 
     inputFile.close();
     return parameters;
