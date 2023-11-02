@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <variant>
 #include <fstream>
+#include <typeinfo>
+#include <iomanip>
 
 using std::unordered_map;
 using std::string;
@@ -38,9 +40,11 @@ int main() {
     simlog << "Initializing timestep, and grid spacing.\n";
     double CFL = dt / dx;
 
-    simlog << "dx = " << endl;
-    simlog << "dt = " << endl;
-    simlog << "CFL = " << endl;
+    simlog << "dx = " << dx << endl;
+    simlog << typeid(dx).name() << endl;
+    simlog << std::setprecision(3) << dx << endl;
+    simlog << "dt = " << dt << endl;
+    simlog << "CFL = " << CFL << endl;
     return 0;
 }
 
@@ -65,17 +69,17 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename, ofs
         if (delimiterPos != string::npos) {
             string paramName = line.substr(0,delimiterPos);
             string paramValueStr = line.substr(delimiterPos + 1);
-            if (paramName == "N" || "Nt"){
+            if (paramName == "N" || paramName == "Nt"){
                 outputFile << "paramName is " << paramName << endl;
                 outputFile << "paramValueStr is " << paramValueStr << endl;
-                size_t paramValue = stoul(paramValueStr);
+                size_t paramValue = std::stoul(paramValueStr);
                 outputFile << "paramValue is " << paramValue << endl;
                 parameters[paramName] = paramValue;
                 outputFile << paramName << " = " << stoul(paramValueStr) << endl; 
-            } else if (paramName == "dx" || "dt"){
+            } else if (paramName == "dx" || paramName == "dt"){
                 outputFile << "paramName is " << paramName << endl;
                 outputFile << "paramValueStr is " << paramValueStr << endl;
-                double paramValue = stod(paramValueStr);
+                double paramValue = std::stod(paramValueStr);
                 outputFile << "paramValue is " << paramValue << endl;
                 parameters[paramName] = paramValue;
                 outputFile << paramName << " = " << paramValue << endl;
