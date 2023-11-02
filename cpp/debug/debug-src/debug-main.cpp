@@ -23,13 +23,13 @@ using std::endl;
 using std::unordered_map;
 using std::get;
 using std::cerr;
-// using std::filesystem;
+namespace fs = std::experimental::filesystem;
 
 using ParameterValue = std::variant<size_t, double, string>;
 
 // Function prototypes
 bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, string &filename);
-// void clearDataDirectory(const string &directoryPath); 
+void clearDataDirectory(const string &directoryPath); 
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 
 // Main
@@ -87,6 +87,8 @@ int main(){
     simlog << "screw-pinch gamma is " << gamma << endl;
 
     // Initial Conditions
+    // Currently there is a seg fault inside here
+    // First order of business is to create a wrapper around this
     for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
         for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
             for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
@@ -275,6 +277,7 @@ bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, st
 
 // Parse input file and put values into hash
 unordered_map<string, ParameterValue> parseInputFile(const string& filename){
+    
     unordered_map<string, ParameterValue> parameters;
     ifstream inputFile(filename);
 
@@ -282,28 +285,23 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
         cerr << "Error opening input file: " << filename << endl;
         return parameters;
     }
-
+    
     string line;
     while (getline(inputFile, line)) {
         size_t delimiterPos = line.find('=');
         if (delimiterPos != string::npos) {
             string paramName = line.substr(0,delimiterPos);
             string paramValueStr = line.substr(delimiterPos + 1);
-
-            try {
-                size_t stValue = stoul(paramValueStr);
-                parameters[paramName] = stValue;
-            } catch (const invalid_argument) {
-                try {
-                    double dubValue = stod(paramValueStr);
-                    parameters[paramName] = dubValue;
-                } catch (const invalid_argument) {
-                    parameters[paramName] = paramValueStr;
-                }
+            if (paramName == "N" || paramName == "Nt"){
+                size_t paramValue = std::stoul(paramValueStr);
+                parameters[paramName] = paramValue;
+            } else if (paramName == "dx" || paramName == "dt"){
+                double paramValue = std::stod(paramValueStr);
+                parameters[paramName] = paramValue;
             }
         }
     }
-
+    
     inputFile.close();
     return parameters;
 }

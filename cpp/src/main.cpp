@@ -54,9 +54,9 @@ int main(){
     simlog << "Initializing timestep, and grid spacing.\n";
     double CFL = dt / dx;
 
-    simlog << "dx = " << endl;
-    simlog << "dt = " << endl;
-    simlog << "CFL = " << endl;
+    simlog << "dx = " << dx << endl;
+    simlog << "dt = " << dt << endl;
+    simlog << "CFL = " << CFL << endl;
 
     simlog << "Initializing Cartesian grid.\n";
     cartesianGrid ComputationalVolume = cartesianGrid(N);
@@ -87,6 +87,8 @@ int main(){
     simlog << "screw-pinch gamma is " << gamma << endl;
 
     // Initial Conditions
+    // Currently there is a seg fault inside here
+    // First order of business is to create a wrapper around this
     for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
         for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
             for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
@@ -116,7 +118,9 @@ int main(){
     bool fileFlag;
 
     // Clear data directory of all files before beginning simulation
+    simlog << "Clearing data files from " << datapath << endl;
     clearDataDirectory(dataPath);
+    simlog << "Data files successfully cleared " << endl;
 
     // Write ICs
     simlog << "Writing Initial Conditions.\n";
