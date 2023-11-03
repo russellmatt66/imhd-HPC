@@ -35,7 +35,7 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 // Main
 int main(){
     ofstream simlog;
-    simlog.open("../debug-build/debuglog.txt");
+    simlog.open("../debug-build/logs/debug.log");
     simlog << "Beginning simulation ...\n";
 
     // Parse input file

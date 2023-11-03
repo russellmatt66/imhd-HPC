@@ -82,34 +82,34 @@ int main(){
     // + 8 rank-3 tensors containing the intermediate variables (required by MacCormack method)
     // + 24 containing the intermediate fluxes
     imhdFluid screwPinchSim = imhdFluid(8, N); 
-
-    double r, r_pinch = 0.5 * (L / 2), gamma = screwPinchSim.getGamma(); // d_pinch = L / 2
-    simlog << "screw-pinch gamma is " << gamma << endl;
+    double gamma = screwPinchSim.getGamma(); // d_pinch = L / 2
+    simlog << "Screw-pinch gamma is " << gamma << endl;
 
     // Initial Conditions
     // Currently there is a seg fault inside here
-    // First order of business is to create a wrapper around this
-    for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
-        for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
-            for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
-                r = ComputationalVolume(i,j,k).r_cyl();
-                if (r < r_pinch) { // Inside pinch
-                    screwPinchSim.rho(i,j,k) = 1.0; // single mass unit 
-                    screwPinchSim.Bz(i,j,k) = 1.0; 
-                    screwPinchSim.rho_w(i,j,k) = 1.0 - pow(r,2) / pow(r_pinch,2);
-                    screwPinchSim.e(i,j,k) = 1.0 / (gamma - 1.0) + 
-                        0.5 * screwPinchSim.rho(i,j,k) * screwPinchSim.v_dot_v(i,j,k) + 
-                        0.5 * screwPinchSim.B_dot_B(i,j,k);
-                }
-                else {
-                    screwPinchSim.rho(i,j,k) = 0.01; // "vacuum"
-                    screwPinchSim.e(i,j,k) = 0.0 + 
-                        0.5 * screwPinchSim.rho(i,j,k) * screwPinchSim.v_dot_v(i,j,k) + 
-                        0.5 * screwPinchSim.B_dot_B(i,j,k); // p_vac = 0.0
-                }
-            }
-        }
-    }
+    InitialConditions(screwPinchSim, ComputationalVolume, L);
+    // double r, r_pinch = 0.5 * (L / 2);
+    // for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
+    //     for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
+    //         for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
+    //             r = ComputationalVolume(i,j,k).r_cyl();
+    //             if (r < r_pinch) { // Inside pinch
+    //                 screwPinchSim.rho(i,j,k) = 1.0; // single mass unit 
+    //                 screwPinchSim.Bz(i,j,k) = 1.0; 
+    //                 screwPinchSim.rho_w(i,j,k) = 1.0 - pow(r,2) / pow(r_pinch,2);
+    //                 screwPinchSim.e(i,j,k) = 1.0 / (gamma - 1.0) + 
+    //                     0.5 * screwPinchSim.rho(i,j,k) * screwPinchSim.v_dot_v(i,j,k) + 
+    //                     0.5 * screwPinchSim.B_dot_B(i,j,k);
+    //             }
+    //             else {
+    //                 screwPinchSim.rho(i,j,k) = 0.01; // "vacuum"
+    //                 screwPinchSim.e(i,j,k) = 0.0 + 
+    //                     0.5 * screwPinchSim.rho(i,j,k) * screwPinchSim.v_dot_v(i,j,k) + 
+    //                     0.5 * screwPinchSim.B_dot_B(i,j,k); // p_vac = 0.0
+    //             }
+    //         }
+    //     }
+    // }
     simlog << "Screw-pinch successfully initialized.\n";
 
     // For creating HDF5 files and holding return value
@@ -118,15 +118,15 @@ int main(){
     bool fileFlag;
 
     // Clear data directory of all files before beginning simulation
-    simlog << "Clearing data files from " << datapath << endl;
+    simlog << "Clearing data files from " << dataPath << endl;
     clearDataDirectory(dataPath);
     simlog << "Data files successfully cleared " << endl;
 
     // Write ICs
-    simlog << "Writing Initial Conditions.\n";
+    simlog << "Writing Initial Conditions to data.\n";
     filePath = "../data/FluidVars_timestep_0.h5";
     fileFlag = createHDF5File(screwPinchSim,ComputationalVolume,filePath);
-    simlog << "Initial Conditions successfully written.\n";
+    simlog << "Initial Conditions successfully written to data.\n";
 
     // Fluid (MacCormack) Advance
     simlog << "Beginning time advance.\n";

@@ -31,7 +31,7 @@ class cartesianPoint{
 		double& z() { return z_; }
 		const double& z() const { return z_; }
 
-		const double r_cyl() { return sqrt(x_ * x_ + y_ * y_); } 
+		const double r_cyl() const { return sqrt(x_ * x_ + y_ * y_); } 
 	private:
 		double x_, y_, z_;
 };

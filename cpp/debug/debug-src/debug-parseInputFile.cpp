@@ -21,7 +21,7 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename, ofs
 
 int main() {
     ofstream simlog;
-    simlog.open("../debug-build/parseInput.log");
+    simlog.open("../debug-build/logs/parseInput.log");
     simlog << "Beginning simulation ...\n";
 
     // Parse input file

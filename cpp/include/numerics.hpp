@@ -1,9 +1,37 @@
 #ifndef NUMERICS
 #define NUMERICS
 
+#include<cmath>
+
 #include "rank3Tensor.hpp"
 #include "imhdFluid.hpp"
 #include "fluxFunctions.hpp"
+
+// Initial Conditions
+void InitialConditions(imhdFluid& imhdFluid, const cartesianGrid& ComputationalVolume, const double L){
+    double r, r_pinch = 0.5 * (L / 2), gamma = imhdFluid.getGamma();
+    for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
+        for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
+            for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
+                r = ComputationalVolume(i,j,k).r_cyl();
+                if (r < r_pinch) { // Inside pinch
+                    imhdFluid.rho(i,j,k) = 1.0; // single mass unit 
+                    imhdFluid.Bz(i,j,k) = 1.0; 
+                    imhdFluid.rho_w(i,j,k) = 1.0 - pow(r,2) / pow(r_pinch,2);
+                    imhdFluid.e(i,j,k) = 1.0 / (gamma - 1.0) + 
+                        0.5 * imhdFluid.rho(i,j,k) * imhdFluid.v_dot_v(i,j,k) + 
+                        0.5 * imhdFluid.B_dot_B(i,j,k);
+                }
+                else {
+                    imhdFluid.rho(i,j,k) = 0.01; // "vacuum"
+                    imhdFluid.e(i,j,k) = 0.0 + 
+                        0.5 * imhdFluid.rho(i,j,k) * imhdFluid.v_dot_v(i,j,k) + 
+                        0.5 * imhdFluid.B_dot_B(i,j,k); // p_vac = 0.0
+                }
+            }
+        }
+    }
+}
 
 // Timestep
 void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx){
