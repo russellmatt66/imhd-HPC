@@ -8,7 +8,7 @@ src/ - The source code is in here.
 
 include/ - The library functions are in here.
 
-data/ - The data from each run, in the form of .h5 files, appears in here. This directory is necessary for the code to operate, so I pushed it to Github. At the beginning of each run, all the files from this folder are removed. Currently, there is only a single .h5 file located inside the directory. This is a placeholder file from the point in the project when I was debugging a segfault in the creation of the data files, so it will not render correctly in VisIt.   
+data/ - The data from each run, in the form of .h5 files, appears in here. **This directory is necessary for the code to operate**, so I pushed it to Github. At the beginning of each run, all the files from this folder are removed. Currently, there is only a single .h5 file located inside the directory. This is a placeholder file from the point in the project when I was debugging a segfault in the creation of the data files, so it will not render correctly in VisIt.   
 
 benchmarking/ - All of the code written for benchmarking the various components of the project is contained in here.
 
