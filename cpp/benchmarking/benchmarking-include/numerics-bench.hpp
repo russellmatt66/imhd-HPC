@@ -1,9 +1,37 @@
-#ifndef NUMERICS_BENCH
-#define NUMERICS_BENCH
+#ifndef NUMERICS
+#define NUMERICS
+
+#include<cmath>
 
 #include "rank3Tensor-bench.hpp"
 #include "imhdFluid-bench.hpp"
 #include "fluxFunctions-bench.hpp"
+
+// Initial Conditions
+void InitialConditions(imhdFluid& imhdFluid, const cartesianGrid& ComputationalVolume, const double L){
+    double r, r_pinch = 0.5 * (L / 2), gamma = imhdFluid.getGamma();
+    for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
+        for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
+            for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
+                r = ComputationalVolume(i,j,k).r_cyl();
+                if (r < r_pinch) { // Inside pinch
+                    imhdFluid.rho(i,j,k) = 1.0; // single mass unit 
+                    imhdFluid.Bz(i,j,k) = 1.0; 
+                    imhdFluid.rho_w(i,j,k) = 1.0 - pow(r,2) / pow(r_pinch,2);
+                    imhdFluid.e(i,j,k) = 1.0 / (gamma - 1.0) + 
+                        0.5 * imhdFluid.rho(i,j,k) * imhdFluid.v_dot_v(i,j,k) + 
+                        0.5 * imhdFluid.B_dot_B(i,j,k);
+                }
+                else {
+                    imhdFluid.rho(i,j,k) = 0.01; // "vacuum"
+                    imhdFluid.e(i,j,k) = 0.0 + 
+                        0.5 * imhdFluid.rho(i,j,k) * imhdFluid.v_dot_v(i,j,k) + 
+                        0.5 * imhdFluid.B_dot_B(i,j,k); // p_vac = 0.0
+                }
+            }
+        }
+    }
+}
 
 // Timestep
 void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx){
@@ -103,7 +131,7 @@ void PeriodicBCs(imhdFluid& imhdFluid){
             imhdFluid.Bx(0,j,k) = 0.0; // Perfectly-conducting
             imhdFluid.By(0,j,k) = 0.0;
             imhdFluid.Bz(0,j,k) = 0.0;
-            imhdFluid.e(0,j,k) = imhdFluid.pressure(0,j,k) / (gamma - 1);
+            imhdFluid.e(0,j,k) = imhdFluid.pressure(0,j,k) / (gamma - 1.0);
         
             imhdFluid.rho(N-1,j,k) = 7.0; // "Lithium"
             imhdFluid.rho_u(N-1,j,k) = 0.0; // Rigid wall
@@ -112,7 +140,7 @@ void PeriodicBCs(imhdFluid& imhdFluid){
             imhdFluid.Bx(N-1,j,k) = 0.0; // Perfectly-conducting
             imhdFluid.By(N-1,j,k) = 0.0;
             imhdFluid.Bz(N-1,j,k) = 0.0;
-            imhdFluid.e(N-1,j,k) = imhdFluid.pressure(N-1,j,k) / (gamma - 1);
+            imhdFluid.e(N-1,j,k) = imhdFluid.pressure(N-1,j,k) / (gamma - 1.0);
         }
         // j = 0 and j = N-1 xz-planes
         for (size_t i = 0; i < N; i++){
@@ -123,7 +151,7 @@ void PeriodicBCs(imhdFluid& imhdFluid){
             imhdFluid.Bx(i,0,k) = 0.0; // Perfectly-conducting
             imhdFluid.By(i,0,k) = 0.0;
             imhdFluid.Bz(i,0,k) = 0.0;
-            imhdFluid.e(i,0,k) = imhdFluid.pressure(i,0,k) / (gamma - 1);
+            imhdFluid.e(i,0,k) = imhdFluid.pressure(i,0,k) / (gamma - 1.0);
         
             imhdFluid.rho(i,N-1,k) = 7.0; // "Lithium"
             imhdFluid.rho_u(i,N-1,k) = 0.0; // Rigid wall
@@ -132,7 +160,7 @@ void PeriodicBCs(imhdFluid& imhdFluid){
             imhdFluid.Bx(i,N-1,k) = 0.0; // Perfectly-conducting
             imhdFluid.By(i,N-1,k) = 0.0;
             imhdFluid.Bz(i,N-1,k) = 0.0;
-            imhdFluid.e(i,N-1,k) = imhdFluid.pressure(i,N-1,k) / (gamma - 1);
+            imhdFluid.e(i,N-1,k) = imhdFluid.pressure(i,N-1,k) / (gamma - 1.0);
         }
     }
 }
