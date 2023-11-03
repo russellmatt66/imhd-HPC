@@ -292,6 +292,9 @@ void clearDataDirectory(const string& directoryPath){
     fs::path directory(directoryPath);
 
     for (const auto& file : fs::directory_iterator(directory)){
+        if (file.path.filename() == "README.txt"){ }
+        else {
         fs::remove(file);
+        }
     }
 }
