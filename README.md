@@ -2,8 +2,7 @@
 Scientific computing project to solve the Ideal MHD equations using a Lax-Wendroff scheme. Code achieves performance via contiguous memory accesses.
 
 # C++
-Currently, debugging a segfault in the screw-pinch initialization. 
-Need to write a wrapper for this step. 
+Fixed segfault, it was actually in the createHDF5File() function. Problem was dynamically-allocating an array whose value was not known at run-time. 
 
 ## Build
 
