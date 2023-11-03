@@ -88,28 +88,6 @@ int main(){
     // Initial Conditions
     // Currently there is a seg fault inside here
     InitialConditions(screwPinchSim, ComputationalVolume, L);
-    // double r, r_pinch = 0.5 * (L / 2);
-    // for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
-    //     for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
-    //         for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
-    //             r = ComputationalVolume(i,j,k).r_cyl();
-    //             if (r < r_pinch) { // Inside pinch
-    //                 screwPinchSim.rho(i,j,k) = 1.0; // single mass unit 
-    //                 screwPinchSim.Bz(i,j,k) = 1.0; 
-    //                 screwPinchSim.rho_w(i,j,k) = 1.0 - pow(r,2) / pow(r_pinch,2);
-    //                 screwPinchSim.e(i,j,k) = 1.0 / (gamma - 1.0) + 
-    //                     0.5 * screwPinchSim.rho(i,j,k) * screwPinchSim.v_dot_v(i,j,k) + 
-    //                     0.5 * screwPinchSim.B_dot_B(i,j,k);
-    //             }
-    //             else {
-    //                 screwPinchSim.rho(i,j,k) = 0.01; // "vacuum"
-    //                 screwPinchSim.e(i,j,k) = 0.0 + 
-    //                     0.5 * screwPinchSim.rho(i,j,k) * screwPinchSim.v_dot_v(i,j,k) + 
-    //                     0.5 * screwPinchSim.B_dot_B(i,j,k); // p_vac = 0.0
-    //             }
-    //         }
-    //     }
-    // }
     simlog << "Screw-pinch successfully initialized.\n";
 
     // For creating HDF5 files and holding return value
@@ -160,7 +138,8 @@ bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, st
         size_t N = imhdData.getSideLen();
 
         hsize_t dims[3] = {N, N, N}; 
-        double buffer[N][N][N];
+        rank3Tensor buffer(N);
+        const double* dataPtr = buffer.get_storage().data();
 
         H5::DataSpace dspcFluidVars(3,dims);
 
@@ -206,34 +185,34 @@ bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, st
             for (size_t k = 0; k < N; k++){
                 for (size_t i = 0; i < N; i++){
                     for (size_t j = 0; j < N; j++){
-                        buffer[k][i][j] = imhdData.imhdVar(iv,i,j,k);
+                        buffer(i,j,k) = imhdData.imhdVar(iv,i,j,k);
                     }
                 }
             }
             switch (iv) {
                 case 0: // rho
-                    dstFluidVars_rho.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+                    dstFluidVars_rho.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
                     break;
                 case 1: // rho_u
-                    dstFluidVars_rhou.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+                    dstFluidVars_rhou.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
                     break;
                 case 2: // rho_v
-                    dstFluidVars_rhov.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+                    dstFluidVars_rhov.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
                     break;    
                 case 3: // rho_w
-                    dstFluidVars_rhow.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+                    dstFluidVars_rhow.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
                     break;
                 case 4: // rho_Bx
-                    dstFluidVars_Bx.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+                    dstFluidVars_Bx.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
                     break;
                 case 5: // rho_By
-                    dstFluidVars_By.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+                    dstFluidVars_By.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
                     break;
                 case 6: // rho_Bz
-                    dstFluidVars_Bz.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+                    dstFluidVars_Bz.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
                     break;
                 case 7: // energy
-                    dstFluidVars_e.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+                    dstFluidVars_e.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
                     break;
             }
         }
@@ -242,31 +221,31 @@ bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, st
         for (size_t k = 0; k < N; k++){
             for (size_t i = 0; i < N; i++){
                 for (size_t j = 0; j < N; j++){
-                    buffer[k][i][j] = gridData(i,j,k).x();
+                    buffer(i,j,k) = gridData(i,j,k).x();
                 }
             }
         }
-        dstCartMesh_x.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+        dstCartMesh_x.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
 
         // Now write Cartesian grid - y
         for (size_t k = 0; k < N; k++){
             for (size_t i = 0; i < N; i++){
                 for (size_t j = 0; j < N; j++){
-                    buffer[k][i][j] = gridData(i,j,k).y();
+                    buffer(i,j,k) = gridData(i,j,k).y();
                 }
             }
         }
-        dstCartMesh_y.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+        dstCartMesh_y.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
 
         // Now write Cartesian grid - z
         for (size_t k = 0; k < N; k++){
             for (size_t i = 0; i < N; i++){
                 for (size_t j = 0; j < N; j++){
-                    buffer[k][i][j] = gridData(i,j,k).z();
+                    buffer(i,j,k) = gridData(i,j,k).z();
                 }
             }
         }
-        dstCartMesh_z.write(&buffer, H5::PredType::NATIVE_DOUBLE);
+        dstCartMesh_z.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
 
         datafile.close();
 

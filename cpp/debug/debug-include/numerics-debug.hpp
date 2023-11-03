@@ -13,16 +13,20 @@ using std::endl;
 // Initial Conditions
 void InitialConditions(imhdFluid& imhdFluid, const cartesianGrid& ComputationalVolume, const double L, std::ofstream& log){
     double r, r_pinch = 0.5 * (L / 2), gamma = imhdFluid.getGamma();
+    log << "r_pinch = " << r_pinch << endl;
     for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
         for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
             for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
                 r = ComputationalVolume(i,j,k).r_cyl();
-                log << "(i,j,k) = " << "(" << i << "," << j << "," << k << ")" << endl; 
-                log << "(x,y,z) = " << "(" << ComputationalVolume(i,j,k).x() << "," 
-                    << ComputationalVolume(i,j,k).y() << "," << ComputationalVolume(i,j,k).z() << ")"
-                    << endl;
-                log << "r_cyl() = " << r << endl;
-                log << "~~~~~" << endl; 
+                if ((i % 8) == 0 && (j % 8) == 0 && (k % 8) == 0){ // modulus should always be a power of two 
+                    log << "(i,j,k) = " << "(" << i << "," << j << "," << k << ")" << endl; 
+                    log << "(x,y,z) = " << "(" << ComputationalVolume(i,j,k).x() << "," 
+                        << ComputationalVolume(i,j,k).y() << "," 
+                        << ComputationalVolume(i,j,k).z() << ")"
+                        << endl;
+                    log << "r_cyl() = " << r << endl;
+                    log << "~~~~~" << endl; 
+                }
                 if (r < r_pinch) { // Inside pinch
                     imhdFluid.rho(i,j,k) = 1.0; // single mass unit 
                     imhdFluid.Bz(i,j,k) = 1.0; 

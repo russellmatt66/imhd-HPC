@@ -3,4 +3,5 @@ cpp/.vscode
 cpp/build/*
 cpp/debug/debug-build/*
 cpp/test/test-build/*
+cpp/data/*
 cpp/debug/debug-data/*

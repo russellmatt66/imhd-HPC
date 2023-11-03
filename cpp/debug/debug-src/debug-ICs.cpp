@@ -28,7 +28,7 @@ namespace fs = std::experimental::filesystem;
 using ParameterValue = std::variant<size_t, double, string>;
 
 // Function prototypes
-bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, string &filename);
+bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, const string &filename, ofstream& debuglog);
 void clearDataDirectory(const string &directoryPath); 
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 
@@ -55,9 +55,9 @@ int main(){
     simlog << "Initializing timestep, and grid spacing.\n";
     double CFL = dt / dx;
 
-    simlog << "dx = " << endl;
-    simlog << "dt = " << endl;
-    simlog << "CFL = " << endl;
+    simlog << "dx = " << dx << endl;
+    simlog << "dt = " << dt << endl;
+    simlog << "CFL = " << CFL << endl;
 
     simlog << "Initializing Cartesian grid.\n";
     cartesianGrid ComputationalVolume = cartesianGrid(N);
@@ -103,6 +103,14 @@ int main(){
     clearDataDirectory(dataPath);
     simlog << "Data files successfully cleared " << endl;
 
+    // Write Initial Conditions to HDF5 file
+    simlog << "Writing Initial Conditions to data.\n";
+    filePath = "../debug-data/FluidVars_timestep_0.h5";
+    ofstream HDF5log;
+    HDF5log.open("../debug-build/logs/hdf5.log");
+    fileFlag = createHDF5File(screwPinchSim,ComputationalVolume,filePath,HDF5log);
+    simlog << "HDF5 file creation returned with boolean " << fileFlag << endl; 
+    simlog << "Initial Conditions successfully written to data.\n";
     return 0;
 }
 
@@ -135,6 +143,197 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
     
     inputFile.close();
     return parameters;
+}
+
+// HDF5 file creation with C++ API
+bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, const string &filename, ofstream& debuglog){
+    // Create file with the given name and fluid variables
+    debuglog << "Inside createHDF5File()" << endl;
+    try {
+        // Create file
+        debuglog << "Creating datafile" << endl;
+        H5::H5File datafile(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+        debuglog << "datafile object created" << endl;
+
+        // Declare dataspace dimensions and dataspace for fluid variables 
+        size_t numVars = imhdData.getNumVars();
+        size_t N = imhdData.getSideLen();
+
+        debuglog << "N is " << N << endl;
+        debuglog << "numVars is " << numVars << endl;
+
+        hsize_t dims[3] = {N, N, N}; 
+        debuglog << "dims[0] = " << dims[0] << endl;
+        debuglog << "dims[1] = " << dims[1] << endl;
+        debuglog << "dims[2] = " << dims[2] << endl;
+
+
+        debuglog << "Creating buffer object" << endl;
+        /* Problem is here! */ 
+        // double buffer[N][N][N];
+        rank3Tensor buffer(N);
+        const double *dataPtr = buffer.get_storage().data();
+        debuglog << "Buffer object created" << endl;
+
+        debuglog << "Creating dataspace object" << endl;
+        H5::DataSpace dspcFluidVars(3,dims);
+        debuglog << "Dataspace object created" << endl;
+
+        // Create group for fluid variables
+        debuglog << "Creating group object" << endl;        
+        H5::Group grpFluidVars = datafile.createGroup("/fluidvars");
+        debuglog << "Group object created" << endl;
+
+        // Write fluid variables to their respective datasets - a little spaghetti but it's worth it
+        debuglog << "Creating dataset for rho" << endl;
+        H5::DataSet dstFluidVars_rho = 
+            grpFluidVars.createDataSet("rho", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object for rho created" << endl;
+        
+        debuglog << "Creating dataset for rho_u" << endl;
+        H5::DataSet dstFluidVars_rhou = 
+            grpFluidVars.createDataSet("rho_u", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object for rho_u created" << endl;
+
+        debuglog << "Creating dataset for rho_v" << endl;
+        H5::DataSet dstFluidVars_rhov = 
+            grpFluidVars.createDataSet("rho_v", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object for rho_v created" << endl;
+
+        debuglog << "Creating dataset for rho_w" << endl;
+        H5::DataSet dstFluidVars_rhow = 
+            grpFluidVars.createDataSet("rho_w", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object for rho_w created" << endl;
+
+        debuglog << "Creating dataset for Bx" << endl;
+        H5::DataSet dstFluidVars_Bx = 
+            grpFluidVars.createDataSet("B_x", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object for Bx created" << endl;
+
+        debuglog << "Creating dataset for By" << endl;
+        H5::DataSet dstFluidVars_By = 
+            grpFluidVars.createDataSet("B_y", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object for By created" << endl;
+
+        debuglog << "Creating dataset for Bz" << endl;
+        H5::DataSet dstFluidVars_Bz = 
+            grpFluidVars.createDataSet("B_z", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object for Bz created" << endl;
+
+        debuglog << "Creating dataset for e" << endl;
+        H5::DataSet dstFluidVars_e = 
+            grpFluidVars.createDataSet("e", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object for e created" << endl;        
+        
+        debuglog << "Creating dataset for Cartesian Mesh - x" << endl;
+        H5::DataSet dstCartMesh_x = 
+            grpFluidVars.createDataSet("cartesian_x", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object created for Cartesian Mesh - x" << endl;
+
+        debuglog << "Creating dataset for Cartesian Mesh - y" << endl;
+        H5::DataSet dstCartMesh_y = 
+            grpFluidVars.createDataSet("cartesian_y", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object created for Cartesian Mesh - x" << endl;
+        
+        debuglog << "Creating dataset for Cartesian Mesh - z" << endl;        
+        H5::DataSet dstCartMesh_z = 
+            grpFluidVars.createDataSet("cartesian_z", H5::PredType::NATIVE_DOUBLE, dspcFluidVars);
+        debuglog << "Dataset object created for Cartesian Mesh - x" << endl;
+        
+        // Write the tensors one by one instead of in a continuous manner.
+        for (size_t iv = 0; iv < numVars; iv++){
+            for (size_t k = 0; k < N; k++){
+                for (size_t i = 0; i < N; i++){
+                    for (size_t j = 0; j < N; j++){
+                        // buffer[k][i][j] = imhdData.imhdVar(iv,i,j,k);
+                        buffer(i,j,k) = imhdData.imhdVar(iv,i,j,k);
+                    }
+                }
+            }
+            switch (iv) {
+                case 0: // rho
+                    debuglog << "Writing buffer for into rho dataset" << endl;
+                    dstFluidVars_rho.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+                    debuglog << "Buffer written into rho dataset" << endl;                    
+                    break;
+                case 1: // rho_u
+                    debuglog << "Writing buffer for into rho_u dataset" << endl;                
+                    dstFluidVars_rhou.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+                    debuglog << "Buffer written into rho_u dataset" << endl;                    
+                    break;
+                case 2: // rho_v
+                    debuglog << "Writing buffer for into rho_v dataset" << endl;
+                    dstFluidVars_rhov.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+                    debuglog << "Buffer written into rho_v dataset" << endl;                    
+                    break;    
+                case 3: // rho_w
+                    debuglog << "Writing buffer for into rho_w dataset" << endl;
+                    dstFluidVars_rhow.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+                    debuglog << "Buffer written into rho_w dataset" << endl;                    
+                    break;
+                case 4: // rho_Bx
+                    debuglog << "Writing buffer for into Bx dataset" << endl;
+                    dstFluidVars_Bx.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+                    debuglog << "Buffer written into Bx dataset" << endl;                    
+                    break;
+                case 5: // rho_By
+                    debuglog << "Writing buffer for into By dataset" << endl;
+                    dstFluidVars_By.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+                    debuglog << "Buffer written into By dataset" << endl;                    
+                    break;
+                case 6: // rho_Bz
+                    debuglog << "Writing buffer for into Bz dataset" << endl;
+                    dstFluidVars_Bz.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+                    debuglog << "Buffer written into Bz dataset" << endl;                    
+                    break;
+                case 7: // energy
+                    debuglog << "Writing buffer for into e dataset" << endl;
+                    dstFluidVars_e.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+                    debuglog << "Buffer written into e dataset" << endl;                    
+                    break;
+            }
+        }
+
+        // Now write Cartesian grid - x
+        for (size_t k = 0; k < N; k++){
+            for (size_t i = 0; i < N; i++){
+                for (size_t j = 0; j < N; j++){
+                    // buffer[k][i][j] = gridData(i,j,k).x();
+                    buffer(i,j,k) = gridData(i,j,k).x();
+                }
+            }
+        }
+        dstCartMesh_x.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+
+        // Now write Cartesian grid - y
+        for (size_t k = 0; k < N; k++){
+            for (size_t i = 0; i < N; i++){
+                for (size_t j = 0; j < N; j++){
+                    // buffer[k][i][j] = gridData(i,j,k).y();
+                    buffer(i,j,k) = gridData(i,j,k).y();
+                }
+            }
+        }
+        dstCartMesh_y.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+
+        // Now write Cartesian grid - z
+        for (size_t k = 0; k < N; k++){
+            for (size_t i = 0; i < N; i++){
+                for (size_t j = 0; j < N; j++){
+                    // buffer[k][i][j] = gridData(i,j,k).z();
+                    buffer(i,j,k) = gridData(i,j,k).z();
+                }
+            }
+        }
+        dstCartMesh_z.write(dataPtr, H5::PredType::NATIVE_DOUBLE);
+
+        datafile.close();
+
+        return true;
+    } catch (const H5::Exception& e) {
+        cerr << "Error creating HDF5 file: " << e.getCDetailMsg() << endl;
+        return false;
+    }
 }
 
 // Intended usage is to clear ../data/ before every run
