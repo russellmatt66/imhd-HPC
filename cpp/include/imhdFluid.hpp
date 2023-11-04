@@ -8,6 +8,8 @@
 class imhdFluid {
 	public:
 		imhdFluid(size_t numVars, size_t N) : 
+            numVars_(numVars), // nunmber of fluid variables
+            N_(N), // number of elements to data cube side 
             variables_(numVars, rank3Tensor(N)), // fluid variables
             intVariables_(numVars, rank3Tensor(N)), // intermediate variables
             xFluxes_(numVars, rank3Tensor(N)), // fluid fluxes
@@ -15,9 +17,7 @@ class imhdFluid {
             zFluxes_(numVars, rank3Tensor(N)),
 			int_xFluxes_(numVars, rank3Tensor(N)), // intermediate fluxes
 			int_yFluxes_(numVars, rank3Tensor(N)),
-			int_zFluxes_(numVars, rank3Tensor(N)),
-            numVars_(numVars),
-            N_(N) // number of elements to data cube side 
+			int_zFluxes_(numVars, rank3Tensor(N))
             {}
         
         // Spaghetti for accessing all the member variables beyond this point.
@@ -292,10 +292,10 @@ class imhdFluid {
         size_t numVars_, N_;
         double gamma = 5.0 / 3.0; // polytropic index
         std::vector<rank3Tensor> variables_; // fluid variables
+        std::vector<rank3Tensor> intVariables_; // intermediate variables
         std::vector<rank3Tensor> xFluxes_;
         std::vector<rank3Tensor> yFluxes_;
         std::vector<rank3Tensor> zFluxes_;
-		std::vector<rank3Tensor> intVariables_; // intermediate variables
 		std::vector<rank3Tensor> int_xFluxes_;
 		std::vector<rank3Tensor> int_yFluxes_;
 		std::vector<rank3Tensor> int_zFluxes_;

@@ -110,6 +110,7 @@ int main(){
 
     // Fluid (MacCormack) Advance
     simlog << "Beginning time advance.\n";
+    auto loop_start = std::chrono::high_resolution_clock::now();
     for (size_t it = 1; it < Nt+1; it++){
         simlog << "Beginning timestep " << it << endl;
         MacCormackAdvance(screwPinchSim,dt,dx);
@@ -121,6 +122,10 @@ int main(){
         fileFlag = createHDF5File(screwPinchSim,ComputationalVolume,filePath);
         simlog << "Data successfully written out.\n";
     }
+    auto loop_stop = std::chrono::high_resolution_clock::now();
+    auto loop_time = std::chrono::duration_cast<timeunits>(loop_stop - loop_start); 
+    simlog << "Simulation loop took " << loop_time.count() << " ms for " 
+        << N << " side-elements, and " << Nt << " timesteps " << endl;
 
     // Close log and halt
     simlog << "Simulation halting successfully. Closing log and returning control.";
@@ -294,7 +299,7 @@ void clearDataDirectory(const string& directoryPath){
     fs::path directory(directoryPath);
 
     for (const auto& file : fs::directory_iterator(directory)){
-        if (file.path.filename() == "README.txt"){ }
+        if (file.path().filename() == "README.md"){ }
         else {
         fs::remove(file);
         }
