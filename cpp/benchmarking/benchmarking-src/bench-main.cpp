@@ -1,5 +1,6 @@
 #define USE_MATH_DEFINES
 
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <cmath>
@@ -7,10 +8,10 @@
 #include <variant>
 #include <chrono>
 
-#include "../include/rank3Tensor-bench.hpp"
-#include "../include/imhdFluid-bench.hpp"
-#include "../include/numerics-bench.hpp"
-#include "../include/fluxFunctions-bench.hpp"
+#include "../benchmarking-include/rank3Tensor-bench.hpp"
+#include "../benchmarking-include/imhdFluid-bench.hpp"
+#include "../benchmarking-include/numerics-bench.hpp"
+#include "../benchmarking-include/fluxFunctions-bench.hpp"
 
 using std::string;
 using std::ofstream;
@@ -18,9 +19,10 @@ using std::ifstream;
 using std::endl;
 using std::unordered_map;
 using std::get;
+using std::cerr;
 
 using ParameterValue = std::variant<size_t, double, string>;
-using timeunits = std::chrono::microseconds;
+using timeunits = std::chrono::milliseconds;
 
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 
@@ -31,14 +33,14 @@ int main(){
 
     // Parse input file
     simlog << "Parsing input file ...\n";
-    unordered_map<string, ParameterValue> inputHash = parseInputFile("../build/imhd.inp");
+    unordered_map<string, ParameterValue> inputHash = parseInputFile("../benchmarking-build/bench.inp");
 
     size_t N = get<size_t>(inputHash["N"]);
     size_t Nt = get<size_t>(inputHash["Nt"]);
     double dx = get<double>(inputHash["dx"]);
     double dt = get<double>(inputHash["dt"]);
 
-    simlog << "Total data volume = " << 64*pow(N,3) << endl;
+    simlog << "Total data volume = " << 64*pow(N,3) << " doubles " << endl;
 
     double CFL = dt / dx;
 
@@ -62,7 +64,7 @@ int main(){
     auto stop_sPSinit = std::chrono::high_resolution_clock::now();
     auto sPSinit_duration = std::chrono::duration_cast<timeunits>(stop_sPSinit - start_sPSinit);
 
-    simlog << "Initializing 64 rank3Tensors of " << N << " elements per side took, " << sPSinit_duration << " us" << endl;
+    simlog << "Initializing 64 rank3Tensors of " << N << " elements per side took: " << sPSinit_duration.count() << " ms" << endl;
 
     double gamma = screwPinchSim.getGamma(); 
     
@@ -71,29 +73,29 @@ int main(){
     auto stop_ICs = std::chrono::high_resolution_clock::now();
     auto ICs_duration = std::chrono::duration_cast<timeunits>(stop_ICs - start_ICs);
 
-    simlog << "Writing Initial Conditions took, " << ICs_duration << " us" << endl; 
+    simlog << "Writing Initial Conditions took: " << ICs_duration.count() << " ms" << endl; 
 
-    std::vector<timeunits> executionTimes_MacCormack;
-    std::vector<timeunits> executionTimes_BCs;
+    std::vector<timeunits> executionTimes_MacCormack(Nt);
+    std::vector<timeunits> executionTimes_BCs(Nt);
 
     auto full_start = std::chrono::high_resolution_clock::now();
     for (size_t it = 1; it < Nt+1; it++){
         auto start_MacAdv = std::chrono::high_resolution_clock::now();
         MacCormackAdvance(screwPinchSim,dt,dx);
         auto stop_MacAdv = std::chrono::high_resolution_clock::now();
-        auto MacAdv_duration = std::chrono::duration_cast<std::chrono::microseconds>(stop_MacAdv - start_MacAdv);
-        executionTimes_MacCormack.push_back(MacAdv_duration);
+        auto MacAdv_duration = std::chrono::duration_cast<timeunits>(stop_MacAdv - start_MacAdv);
+        executionTimes_MacCormack[it-1] = MacAdv_duration;
 
         auto start_BCs = std::chrono::high_resolution_clock::now();
         PeriodicBCs(screwPinchSim);
         auto stop_BCs = std::chrono::high_resolution_clock::now();
-        auto BCs_duration = std::chrono::duration_cast<std::chrono::microseconds>(stop_BCs - start_BCs);
-        executionTimes_BCs.push_back(BCs_duration);
+        auto BCs_duration = std::chrono::duration_cast<timeunits>(stop_BCs - start_BCs);
+        executionTimes_BCs[it-1] = BCs_duration;
     }
     auto full_stop = std::chrono::high_resolution_clock::now();
 
-    auto full_duration = std::chrono::duration_cast<std::chrono::microseconds>(full_stop - full_start);
-    simlog << "Time taken for " << Nt << " timesteps, with " << N << " elements per side: " << full_duration << " us " << endl; 
+    auto full_duration = std::chrono::duration_cast<timeunits>(full_stop - full_start);
+    simlog << "Time taken for " << Nt << " timesteps, with " << N << " elements per side: " << full_duration.count() << " ms " << endl; 
     return 0;
 }
 

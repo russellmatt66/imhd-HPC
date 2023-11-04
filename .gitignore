@@ -1,7 +1,8 @@
 cpp/.vscode
 .vscode/
 cpp/build/*
-cpp/debug/debug-build/*
-cpp/test/test-build/*
 cpp/data/*
 cpp/debug/debug-data/*
+cpp/debug/debug-build/*
+cpp/benchmarking/benchmarking-build/*
+cpp/test/test-build/*

@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <variant>
 #include <stdexcept>
+#include <chrono>
 #include <H5Cpp.h> 
 
 #include "../include/rank3Tensor.hpp"
@@ -26,6 +27,7 @@ using std::cerr;
 namespace fs = std::experimental::filesystem;
 
 using ParameterValue = std::variant<size_t, double, string>;
+using timeunits = std::chrono::milliseconds;
 
 // Function prototypes
 bool createHDF5File(const imhdFluid &imhdData, const cartesianGrid &gridData, string &filename);
