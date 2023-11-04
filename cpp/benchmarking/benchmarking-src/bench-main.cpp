@@ -1,1 +1,128 @@
-// Placeholder
+#define USE_MATH_DEFINES
+
+#include <fstream>
+#include <string>
+#include <cmath>
+#include <unordered_map>
+#include <variant>
+#include <chrono>
+
+#include "../include/rank3Tensor-bench.hpp"
+#include "../include/imhdFluid-bench.hpp"
+#include "../include/numerics-bench.hpp"
+#include "../include/fluxFunctions-bench.hpp"
+
+using std::string;
+using std::ofstream;
+using std::ifstream;
+using std::endl;
+using std::unordered_map;
+using std::get;
+
+using ParameterValue = std::variant<size_t, double, string>;
+using timeunits = std::chrono::microseconds;
+
+unordered_map<string, ParameterValue> parseInputFile(const string& filename);
+
+int main(){
+    ofstream simlog;
+    simlog.open("../benchmarking-build/bench.log");
+    simlog << "Beginning simulation ...\n";
+
+    // Parse input file
+    simlog << "Parsing input file ...\n";
+    unordered_map<string, ParameterValue> inputHash = parseInputFile("../build/imhd.inp");
+
+    size_t N = get<size_t>(inputHash["N"]);
+    size_t Nt = get<size_t>(inputHash["Nt"]);
+    double dx = get<double>(inputHash["dx"]);
+    double dt = get<double>(inputHash["dt"]);
+
+    simlog << "Total data volume = " << 64*pow(N,3) << endl;
+
+    double CFL = dt / dx;
+
+    cartesianGrid ComputationalVolume = cartesianGrid(N);
+    double L = N * dx; // side length
+
+    double x,y,z;
+    for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
+        for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
+            for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
+                x = L/(N-1)*i - L/2;
+                y = L/(N-1)*j - L/2;
+                z = L/(N-1)*k - L/2;
+                ComputationalVolume(i,j,k) = cartesianPoint(x,y,z);
+            }
+        }
+    }
+
+    auto start_sPSinit = std::chrono::high_resolution_clock::now();
+    imhdFluid screwPinchSim = imhdFluid(8, N); 
+    auto stop_sPSinit = std::chrono::high_resolution_clock::now();
+    auto sPSinit_duration = std::chrono::duration_cast<timeunits>(stop_sPSinit - start_sPSinit);
+
+    simlog << "Initializing 64 rank3Tensors of " << N << " elements per side took, " << sPSinit_duration << " us" << endl;
+
+    double gamma = screwPinchSim.getGamma(); 
+    
+    auto start_ICs = std::chrono::high_resolution_clock::now();
+    InitialConditions(screwPinchSim, ComputationalVolume, L);
+    auto stop_ICs = std::chrono::high_resolution_clock::now();
+    auto ICs_duration = std::chrono::duration_cast<timeunits>(stop_ICs - start_ICs);
+
+    simlog << "Writing Initial Conditions took, " << ICs_duration << " us" << endl; 
+
+    std::vector<timeunits> executionTimes_MacCormack;
+    std::vector<timeunits> executionTimes_BCs;
+
+    auto full_start = std::chrono::high_resolution_clock::now();
+    for (size_t it = 1; it < Nt+1; it++){
+        auto start_MacAdv = std::chrono::high_resolution_clock::now();
+        MacCormackAdvance(screwPinchSim,dt,dx);
+        auto stop_MacAdv = std::chrono::high_resolution_clock::now();
+        auto MacAdv_duration = std::chrono::duration_cast<std::chrono::microseconds>(stop_MacAdv - start_MacAdv);
+        executionTimes_MacCormack.push_back(MacAdv_duration);
+
+        auto start_BCs = std::chrono::high_resolution_clock::now();
+        PeriodicBCs(screwPinchSim);
+        auto stop_BCs = std::chrono::high_resolution_clock::now();
+        auto BCs_duration = std::chrono::duration_cast<std::chrono::microseconds>(stop_BCs - start_BCs);
+        executionTimes_BCs.push_back(BCs_duration);
+    }
+    auto full_stop = std::chrono::high_resolution_clock::now();
+
+    auto full_duration = std::chrono::duration_cast<std::chrono::microseconds>(full_stop - full_start);
+    simlog << "Time taken for " << Nt << " timesteps, with " << N << " elements per side: " << full_duration << " us " << endl; 
+    return 0;
+}
+
+unordered_map<string, ParameterValue> parseInputFile(const string& filename){
+    
+    unordered_map<string, ParameterValue> parameters;
+    ifstream inputFile(filename);
+
+    if (!inputFile.is_open()) {
+        cerr << "Error opening input file: " << filename << endl;
+        return parameters;
+    }
+    
+    string line;
+    while (getline(inputFile, line)) {
+        size_t delimiterPos = line.find('=');
+        if (delimiterPos != string::npos) {
+            string paramName = line.substr(0,delimiterPos);
+            string paramValueStr = line.substr(delimiterPos + 1);
+            if (paramName == "N" || paramName == "Nt"){
+                size_t paramValue = std::stoul(paramValueStr);
+                parameters[paramName] = paramValue;
+            } else if (paramName == "dx" || paramName == "dt"){
+                double paramValue = std::stod(paramValueStr);
+                parameters[paramName] = paramValue;
+            }
+        }
+    }
+    
+    inputFile.close();
+    return parameters;
+}

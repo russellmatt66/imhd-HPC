@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <experimental/filesystem> // I have gcc 7.5
+#include <experimental/filesystem> 
 #include <cmath>
 #include <unordered_map>
 #include <variant>
@@ -82,7 +82,7 @@ int main(){
     // + 8 rank-3 tensors containing the intermediate variables (required by MacCormack method)
     // + 24 containing the intermediate fluxes
     imhdFluid screwPinchSim = imhdFluid(8, N); 
-    double gamma = screwPinchSim.getGamma(); // d_pinch = L / 2
+    double gamma = screwPinchSim.getGamma(); 
     simlog << "Screw-pinch gamma is " << gamma << endl;
 
     // Initial Conditions
