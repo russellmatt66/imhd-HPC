@@ -1,7 +1,7 @@
 #ifndef NUMERICS
 #define NUMERICS
 
-#include<cmath>
+#include <cmath>
 
 #include "rank3Tensor.hpp"
 #include "imhdFluid.hpp"
@@ -33,9 +33,11 @@ void InitialConditions(imhdFluid& imhdFluid, const cartesianGrid& ComputationalV
     }
 }
 
-// Timestep
-void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx){
-    double dy = dx, dz = dx;
+// Numerical algorithm for performing the time advance
+// D is the numerical diffusion coefficient. 
+// In simulations of convection, diffusion is artificially introduced in order to stabilize high-frequency modes.
+void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx, const double D){
+    double dy = dx, dz = dx; // Can optimize this
     size_t N = imhdFluid.getSideLen(), numVars = imhdFluid.getNumVars();
 
     // Compute fluxes
@@ -48,7 +50,7 @@ void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx){
         for (size_t k = 0; k < N; k++){ 
             for (size_t i = 1; i < N-1; i++){ // handle walls separately, don't need to compute intermediate variables there
                 for (size_t j = 1; j < N-1; j++){
-                    if (k == 0) { // Periodic in Z
+                    if (k == 0) { // Periodic in Z - nature of equations makes this a corner case
                         imhdFluid.intermediateVar(iv,i,j,0) = imhdFluid.imhdVar(iv,i,j,0) 
                             - (dt / dx) * (imhdFluid.xfluxes(iv,i,j,0) - imhdFluid.xfluxes(iv,i-1,j,0))
                             - (dt / dy) * (imhdFluid.yfluxes(iv,i,j,0) - imhdFluid.yfluxes(iv,i,j-1,0)) 
@@ -74,9 +76,9 @@ void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx){
     // Advance fluid variables on interior
     for (size_t iv = 0; iv < numVars; iv++){
         for (size_t k = 0; k < N; k++){ 
-            for (size_t i = 1; i < N-1; i++){ // handle walls separately, don't need to compute intermediate variables there
+            for (size_t i = 1; i < N-1; i++){ // handle walls separately, don't need to compute fluid variables there
                 for (size_t j = 1; j < N-1; j++){
-                    if (k == N-1) {
+                    if (k == N-1) { // Periodic in Z - nature of equations makes this a corner case
                         imhdFluid.imhdVar(iv,i,j,N-1) = 0.5 * (imhdFluid.imhdVar(iv,i,j,N-1) - imhdFluid.intermediateVar(iv,i,j,N-1))
                             - 0.5 * (dt / dx) * (imhdFluid.int_xfluxes(iv,i+1,j,N-1) - imhdFluid.int_xfluxes(iv,i,j,N-1)) 
                             - 0.5 * (dt / dy) * (imhdFluid.int_yfluxes(iv,i,j+1,N-1) - imhdFluid.int_yfluxes(iv,i,j,N-1))
@@ -165,4 +167,29 @@ void PeriodicBCs(imhdFluid& imhdFluid){
     }
 }
 
+// Fourth-order centered difference on interior, forward and backward, respectively, at the edges.
+// LOTS of room for optimization in this function, that will be for a later date. 
+// Just note the places, and get an MVP. 
+double NumericalDiffusion(const double D, const size_t iv, const size_t i, const size_t j, const size_t k, const imhdFluid& imhdFluid, const double dx){
+    // iv - the fluid variable whose Laplacian is being approximated
+    // This can be optimized, declaring these variables each time is not insignificant
+    double Q_xx, Q_yy, Q_zz; 
+    size_t N = imhdFluid.getSideLen(); 
+
+    if (i == 0 || i == 1 || j == 0 || j == 1 || k == 0 || k == 1) { // boundary is two steps to the left => Forward difference 
+        // Fourth-order Forward difference
+    }
+    else if (i == N-1 || i == N-2 || j == N-1 || j == N-2 || k == N-1 || k == N-2){ // boundary is two steps to the right => Backward difference
+        // Fourth-order Backward difference
+    }
+    else { // on interior => centered difference
+        Q_xx = -(1.0 / (12.0 * pow(dx,2))) * (imhdFluid.imhdVar(iv,i+2,j,k) + 16.0 * imhdFluid.imhdVar(iv,i+1,j,k) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i-1,j,k) - imhdFluid.imhdVar(iv,i-2,j,k));
+        Q_yy = -(1.0 / (12.0 * pow(dx,2))) * (imhdFluid.imhdVar(iv,i,j+2,k) + 16.0 * imhdFluid.imhdVar(iv,i,j+1,k) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i,j-1,k) - imhdFluid.imhdVar(iv,i,j-2,k));
+        Q_zz = -(1.0 / (12.0 * pow(dx,2))) * (imhdFluid.imhdVar(iv,i,j,k+2) + 16.0 * imhdFluid.imhdVar(iv,i,j,k+1) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i,j,k-1) - imhdFluid.imhdVar(iv,i,j,k-2));
+    }
+
+}
 #endif
