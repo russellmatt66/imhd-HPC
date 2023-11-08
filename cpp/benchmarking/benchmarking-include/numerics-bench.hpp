@@ -115,7 +115,6 @@ void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx, c
         for (size_t k = 0; k < N; k++){ 
             for (size_t i = 1; i < N-1; i++){ // handle walls separately, don't need to compute fluid variables there
                 for (size_t j = 1; j < N-1; j++){
-                    std::ofstream& benchlog, 
                     NumericalDiffusion(diffVector, D, iv, i, j, k, imhdFluid, dx); // updates diffVector
                     if (k == N-1) { // Periodic in Z - nature of equations makes this a corner case
                         imhdFluid.imhdVar(iv,i,j,N-1) = 0.5 * (imhdFluid.imhdVar(iv,i,j,N-1) - imhdFluid.intermediateVar(iv,i,j,N-1))
