@@ -46,6 +46,42 @@ void InitialConditions(imhdFluid& imhdFluid, const cartesianGrid& ComputationalV
     }
 }
 
+cartesianPoint& NumericalDiffusion(std::ofstream& debuglog, const double D, const size_t iv, const size_t i, const size_t j, const size_t k, const imhdFluid& imhdFluid, const double dx){
+    // iv - the fluid variable whose Laplacian is being approximated
+    // This can be optimized, declaring these variables each time is not insignificant
+    double Q_xx, Q_yy, Q_zz; 
+    size_t N = imhdFluid.getSideLen(); 
+
+    debuglog << "(i,j,k) = " << "(" << i << "," << j << "," << k << ")" << endl;
+
+    if (i == 0 || i == 1 || j == 0 || j == 1 || k == 0 || k == 1) { // boundary is two steps to the left => Forward difference 
+        // Second-order Forward difference
+        debuglog << "Computing forward difference" << endl;
+        Q_xx = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i+1,j,k) - imhdFluid.imhdVar(iv,i+2,j,k));
+        Q_yy = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i,j+1,k) - imhdFluid.imhdVar(iv,i,j+2,k));
+        Q_zz = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i,j,k+1) - imhdFluid.imhdVar(iv,i,j,k+2));
+    }
+    else if (i == N-1 || i == N-2 || j == N-1 || j == N-2 || k == N-1 || k == N-2){ // boundary is two steps to the right => Backward difference
+        // Second-order Backward difference
+        debuglog << "Computing backward difference" << endl;
+        Q_xx = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i-1,j,k) + imhdFluid.imhdVar(iv,i-2,j,k));
+        Q_yy = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i,j-1,k) + imhdFluid.imhdVar(iv,i,j-2,k));
+        Q_zz = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i,j-1,k) + imhdFluid.imhdVar(iv,i,j,k-2));
+    }
+    else { // on interior => centered difference
+        debuglog << "Computing centered difference" << endl;
+        Q_xx = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i+2,j,k) + 16.0 * imhdFluid.imhdVar(iv,i+1,j,k) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i-1,j,k) - imhdFluid.imhdVar(iv,i-2,j,k));
+        Q_yy = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i,j+2,k) + 16.0 * imhdFluid.imhdVar(iv,i,j+1,k) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i,j-1,k) - imhdFluid.imhdVar(iv,i,j-2,k));
+        Q_zz = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i,j,k+2) + 16.0 * imhdFluid.imhdVar(iv,i,j,k+1) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i,j,k-1) - imhdFluid.imhdVar(iv,i,j,k-2));
+    }
+    cartesianPoint diffVector = cartesianPoint(Q_xx, Q_yy, Q_zz);
+    return diffVector;
+    // return cartesianPoint(Q_xx, Q_yy, Q_zz);
+}
+
 // Timestep
 void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx){
     double dy = dx, dz = dx;

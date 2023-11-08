@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.22)
 project(imhd_DEBUG VERSION 1.0)
 
 # set(CMAKE_CXX_FLAGS "-std=c++17")
@@ -22,9 +22,11 @@ INCLUDE_DIRECTORIES (${HDF5_INCLUDE_DIR})
 # add_executable(parse-input debug-parseInputFile.cpp)
 
 # executable for debugging ICs and createHDF5File() 
-add_executable (debug-ICs debug-ICs.cpp)
+# add_executable (debug-ICs debug-ICs.cpp)
 
-target_link_libraries (debug-ICs PRIVATE ${LINK_LIBS} stdc++fs)
+add_executable(debug-numDiff debug-numDiff.cpp)
+
+target_link_libraries (debug-numDiff PRIVATE ${LINK_LIBS} stdc++fs)
 
 # Release binary
 # add_executable(imhd-debug debug-main.cpp)
