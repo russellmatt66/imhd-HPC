@@ -1,3 +1,15 @@
+/*
+This file benchmarks the entire simulation with numerical diffusion added into the MacCormack Advance.
+The parts of the project that it measures are the following functions:
+
+(1) Construction of imhdFluid class by STL
+(2) Writing of initial conditions
+(3) MacCormack Advance (w/numerical diffusion)
+(4) Periodic BCs
+(5) Full loop
+
+Performance metrics are obtained using calculations of the number of "floating-point" operations performed by each component.
+*/
 #define USE_MATH_DEFINES
 
 #include <iostream>
@@ -39,6 +51,7 @@ int main(){
     size_t Nt = get<size_t>(inputHash["Nt"]);
     double dx = get<double>(inputHash["dx"]);
     double dt = get<double>(inputHash["dt"]);
+    double D = get<double>(inputHash["D"]);
 
     simlog << "Total data volume = " << 64*pow(N,3) << " doubles " << endl;
 
@@ -81,7 +94,7 @@ int main(){
     auto full_start = std::chrono::high_resolution_clock::now();
     for (size_t it = 1; it < Nt+1; it++){
         auto start_MacAdv = std::chrono::high_resolution_clock::now();
-        MacCormackAdvance(screwPinchSim,dt,dx);
+        MacCormackAdvance(screwPinchSim,dt,dx,D);
         auto stop_MacAdv = std::chrono::high_resolution_clock::now();
         auto MacAdv_duration = std::chrono::duration_cast<timeunits>(stop_MacAdv - start_MacAdv);
         executionTimes_MacCormack[it-1] = MacAdv_duration;

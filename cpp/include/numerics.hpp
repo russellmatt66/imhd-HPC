@@ -2,6 +2,8 @@
 #define NUMERICS
 
 #include <cmath>
+#include <fstream>
+#include <chrono>
 
 #include "rank3Tensor.hpp"
 #include "imhdFluid.hpp"
@@ -77,12 +79,11 @@ void NumericalDiffusion(cartesianPoint diffVector, const double D, const size_t 
     diffVector.x() = Q_xx;
     diffVector.y() = Q_yy;
     diffVector.z() = Q_zz;
-    // return cartesianPoint(Q_xx, Q_yy, Q_zz);
 }
 
 // Numerical algorithm for performing the time advance 
 // D is the numerical diffusion coefficient. 
-void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx, const double D){
+void MacCormackAdvance(std::ofstream& benchlog, imhdFluid& imhdFluid, const double dt, const double dx, const double D){
     double dy = dx, dz = dx; // Can optimize this
     size_t N = imhdFluid.getSideLen(), numVars = imhdFluid.getNumVars();
     cartesianPoint diffVector = cartesianPoint(0.0,0.0,0.0);
@@ -126,20 +127,21 @@ void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx, c
         for (size_t k = 0; k < N; k++){ 
             for (size_t i = 1; i < N-1; i++){ // handle walls separately, don't need to compute fluid variables there
                 for (size_t j = 1; j < N-1; j++){
+                    benchlog <<
                     NumericalDiffusion(diffVector, D, iv, i, j, k, imhdFluid, dx); // updates diffVector
                     if (k == N-1) { // Periodic in Z - nature of equations makes this a corner case
                         imhdFluid.imhdVar(iv,i,j,N-1) = 0.5 * (imhdFluid.imhdVar(iv,i,j,N-1) - imhdFluid.intermediateVar(iv,i,j,N-1))
                             - 0.5 * (dt / dx) * (imhdFluid.int_xfluxes(iv,i+1,j,N-1) - imhdFluid.int_xfluxes(iv,i,j,N-1)) 
                             - 0.5 * (dt / dy) * (imhdFluid.int_yfluxes(iv,i,j+1,N-1) - imhdFluid.int_yfluxes(iv,i,j,N-1))
                             - 0.5 * (dt / dz) * (imhdFluid.int_zfluxes(iv,i,j,N-1) - imhdFluid.int_zfluxes(iv,i,j,1)) 
-                            - (diffVector.x() + diffVector.y() + diffVector.z());
+                            - D*(diffVector.x() + diffVector.y() + diffVector.z());
                     }
                     else {
                         imhdFluid.imhdVar(iv,i,j,k) = 0.5 * (imhdFluid.imhdVar(iv,i,j,k) - imhdFluid.intermediateVar(iv,i,j,k))
                             - 0.5 * (dt / dx) * (imhdFluid.int_xfluxes(iv,i+1,j,k) - imhdFluid.int_xfluxes(iv,i,j,k)) 
                             - 0.5 * (dt / dy) * (imhdFluid.int_yfluxes(iv,i,j+1,k) - imhdFluid.int_yfluxes(iv,i,j,k))
                             - 0.5 * (dt / dz) * (imhdFluid.int_zfluxes(iv,i,j,k) - imhdFluid.int_zfluxes(iv,i,j,k+1))
-                            - (diffVector.x() + diffVector.y() + diffVector.z());
+                            - D*(diffVector.x() + diffVector.y() + diffVector.z());
                     }
 
                 }
