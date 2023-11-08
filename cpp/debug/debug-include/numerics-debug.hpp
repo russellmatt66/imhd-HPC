@@ -60,6 +60,7 @@ cartesianPoint& NumericalDiffusion(std::ofstream& debuglog, const double D, cons
         Q_xx = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i+1,j,k) - imhdFluid.imhdVar(iv,i+2,j,k));
         Q_yy = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i,j+1,k) - imhdFluid.imhdVar(iv,i,j+2,k));
         Q_zz = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i,j,k+1) - imhdFluid.imhdVar(iv,i,j,k+2));
+        debuglog << "Forward difference computed" << endl;
     }
     else if (i == N-1 || i == N-2 || j == N-1 || j == N-2 || k == N-1 || k == N-2){ // boundary is two steps to the right => Backward difference
         // Second-order Backward difference
@@ -67,6 +68,7 @@ cartesianPoint& NumericalDiffusion(std::ofstream& debuglog, const double D, cons
         Q_xx = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i-1,j,k) + imhdFluid.imhdVar(iv,i-2,j,k));
         Q_yy = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i,j-1,k) + imhdFluid.imhdVar(iv,i,j-2,k));
         Q_zz = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i,j-1,k) + imhdFluid.imhdVar(iv,i,j,k-2));
+        debuglog << "Backward difference computed" << endl;
     }
     else { // on interior => centered difference
         debuglog << "Computing centered difference" << endl;
@@ -76,8 +78,10 @@ cartesianPoint& NumericalDiffusion(std::ofstream& debuglog, const double D, cons
             + 16.0 * imhdFluid.imhdVar(iv,i,j-1,k) - imhdFluid.imhdVar(iv,i,j-2,k));
         Q_zz = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i,j,k+2) + 16.0 * imhdFluid.imhdVar(iv,i,j,k+1) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
             + 16.0 * imhdFluid.imhdVar(iv,i,j,k-1) - imhdFluid.imhdVar(iv,i,j,k-2));
+        debuglog << "Center difference computed" << endl;
     }
     cartesianPoint diffVector = cartesianPoint(Q_xx, Q_yy, Q_zz);
+    debuglog << "(Q_xx, Q_yy, Q_zz) = " << "(" << diffVector.x() << "," << diffVector.y() << "," << diffVector.z() << ")";
     return diffVector;
     // return cartesianPoint(Q_xx, Q_yy, Q_zz);
 }
