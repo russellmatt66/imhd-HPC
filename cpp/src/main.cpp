@@ -48,6 +48,7 @@ int main(){
     size_t Nt = get<size_t>(inputHash["Nt"]);
     double dx = get<double>(inputHash["dx"]);
     double dt = get<double>(inputHash["dt"]);
+    double D = get<double>(inputHash["D"]);
 
     simlog << "N = " << N << endl;
     simlog << "Nt = " << Nt << endl;
@@ -113,7 +114,7 @@ int main(){
     auto loop_start = std::chrono::high_resolution_clock::now();
     for (size_t it = 1; it < Nt+1; it++){
         simlog << "Beginning timestep " << it << endl;
-        MacCormackAdvance(screwPinchSim,dt,dx);
+        MacCormackAdvance(screwPinchSim,dt,dx,D);
         simlog << "Advance completed. Writing boundary conditions\n";
         PeriodicBCs(screwPinchSim);
         simlog << "Boundary conditions written.\n";
@@ -283,7 +284,7 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
             if (paramName == "N" || paramName == "Nt"){
                 size_t paramValue = std::stoul(paramValueStr);
                 parameters[paramName] = paramValue;
-            } else if (paramName == "dx" || paramName == "dt"){
+            } else if (paramName == "dx" || paramName == "dt" || paramName == "D"){
                 double paramValue = std::stod(paramValueStr);
                 parameters[paramName] = paramValue;
             }

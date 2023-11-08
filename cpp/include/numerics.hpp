@@ -33,9 +33,41 @@ void InitialConditions(imhdFluid& imhdFluid, const cartesianGrid& ComputationalV
     }
 }
 
-// Numerical algorithm for performing the time advance
-// D is the numerical diffusion coefficient. 
 // In simulations of convection, diffusion is artificially introduced in order to stabilize high-frequency modes.
+// Fourth-order centered difference on interior, forward and backward, respectively, at the edges.
+// LOTS of room for optimization in this function, that will be for a later date. 
+// Just note the places, and get an MVP. 
+cartesianPoint NumericalDiffusion(const double D, const size_t iv, const size_t i, const size_t j, const size_t k, const imhdFluid& imhdFluid, const double dx){
+    // iv - the fluid variable whose Laplacian is being approximated
+    // This can be optimized, declaring these variables each time is not insignificant
+    double Q_xx, Q_yy, Q_zz; 
+    size_t N = imhdFluid.getSideLen(); 
+
+    if (i == 0 || i == 1 || j == 0 || j == 1 || k == 0 || k == 1) { // boundary is two steps to the left => Forward difference 
+        // Second-order Forward difference
+        Q_xx = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i+1,j,k) - imhdFluid.imhdVar(iv,i+2,j,k));
+        Q_yy = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i,j+1,k) - imhdFluid.imhdVar(iv,i,j+2,k));
+        Q_zz = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i,j,k+1) - imhdFluid.imhdVar(iv,i,j,k+2));
+    }
+    else if (i == N-1 || i == N-2 || j == N-1 || j == N-2 || k == N-1 || k == N-2){ // boundary is two steps to the right => Backward difference
+        // Second-order Backward difference
+        Q_xx = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i-1,j,k) + imhdFluid.imhdVar(iv,i-2,j,k));
+        Q_yy = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i,j-1,k) + imhdFluid.imhdVar(iv,i,j-2,k));
+        Q_zz = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i,j-1,k) + imhdFluid.imhdVar(iv,i,j,k-2));
+    }
+    else { // on interior => centered difference
+        Q_xx = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i+2,j,k) + 16.0 * imhdFluid.imhdVar(iv,i+1,j,k) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i-1,j,k) - imhdFluid.imhdVar(iv,i-2,j,k));
+        Q_yy = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i,j+2,k) + 16.0 * imhdFluid.imhdVar(iv,i,j+1,k) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i,j-1,k) - imhdFluid.imhdVar(iv,i,j-2,k));
+        Q_zz = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i,j,k+2) + 16.0 * imhdFluid.imhdVar(iv,i,j,k+1) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
+            + 16.0 * imhdFluid.imhdVar(iv,i,j,k-1) - imhdFluid.imhdVar(iv,i,j,k-2));
+    }
+    return cartesianPoint(Q_xx, Q_yy, Q_zz);
+}
+
+// Numerical algorithm for performing the time advance 
+// D is the numerical diffusion coefficient. 
 void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx, const double D){
     double dy = dx, dz = dx; // Can optimize this
     size_t N = imhdFluid.getSideLen(), numVars = imhdFluid.getNumVars();
@@ -74,6 +106,7 @@ void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx, c
     int_computefluxes_z(imhdFluid);
     
     // Advance fluid variables on interior
+    // Implement diffusion like an advection-diffusion equation is being solved
     for (size_t iv = 0; iv < numVars; iv++){
         for (size_t k = 0; k < N; k++){ 
             for (size_t i = 1; i < N-1; i++){ // handle walls separately, don't need to compute fluid variables there
@@ -171,35 +204,4 @@ void PeriodicBCs(imhdFluid& imhdFluid){
     }
 }
 
-// Fourth-order centered difference on interior, forward and backward, respectively, at the edges.
-// LOTS of room for optimization in this function, that will be for a later date. 
-// Just note the places, and get an MVP. 
-cartesianPoint NumericalDiffusion(const double D, const size_t iv, const size_t i, const size_t j, const size_t k, const imhdFluid& imhdFluid, const double dx){
-    // iv - the fluid variable whose Laplacian is being approximated
-    // This can be optimized, declaring these variables each time is not insignificant
-    double Q_xx, Q_yy, Q_zz; 
-    size_t N = imhdFluid.getSideLen(); 
-
-    if (i == 0 || i == 1 || j == 0 || j == 1 || k == 0 || k == 1) { // boundary is two steps to the left => Forward difference 
-        // Second-order Forward difference
-        Q_xx = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i+1,j,k) - imhdFluid.imhdVar(iv,i+2,j,k));
-        Q_yy = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i,j+1,k) - imhdFluid.imhdVar(iv,i,j+2,k));
-        Q_zz = (1.0 / (2.0 * dx)) * (-3.0 * imhdFluid.imhdVar(iv,i,j,k) + 4.0 * imhdFluid.imhdVar(iv,i,j,k+1) - imhdFluid.imhdVar(iv,i,j,k+2));
-    }
-    else if (i == N-1 || i == N-2 || j == N-1 || j == N-2 || k == N-1 || k == N-2){ // boundary is two steps to the right => Backward difference
-        // Second-order Backward difference
-        Q_xx = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i-1,j,k) + imhdFluid.imhdVar(iv,i-2,j,k));
-        Q_yy = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i,j-1,k) + imhdFluid.imhdVar(iv,i,j-2,k));
-        Q_zz = (1.0 / (2.0 * dx)) * (3.0 * imhdFluid.imhdVar(iv,i,j,k) - 4.0 * imhdFluid.imhdVar(iv,i,j-1,k) + imhdFluid.imhdVar(iv,i,j,k-2));
-    }
-    else { // on interior => centered difference
-        Q_xx = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i+2,j,k) + 16.0 * imhdFluid.imhdVar(iv,i+1,j,k) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
-            + 16.0 * imhdFluid.imhdVar(iv,i-1,j,k) - imhdFluid.imhdVar(iv,i-2,j,k));
-        Q_yy = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i,j+2,k) + 16.0 * imhdFluid.imhdVar(iv,i,j+1,k) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
-            + 16.0 * imhdFluid.imhdVar(iv,i,j-1,k) - imhdFluid.imhdVar(iv,i,j-2,k));
-        Q_zz = (1.0 / (12.0 * pow(dx,2))) * (-imhdFluid.imhdVar(iv,i,j,k+2) + 16.0 * imhdFluid.imhdVar(iv,i,j,k+1) - 30.0 * imhdFluid.imhdVar(iv,i,j,k)
-            + 16.0 * imhdFluid.imhdVar(iv,i,j,k-1) - imhdFluid.imhdVar(iv,i,j,k-2));
-    }
-    return cartesianPoint(Q_xx, Q_yy, Q_zz);
-}
 #endif
