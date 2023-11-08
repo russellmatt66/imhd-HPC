@@ -37,6 +37,7 @@ using ParameterValue = std::variant<size_t, double, string>;
 using timeunits = std::chrono::milliseconds;
 
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
+void computeExecutionStatistics(std::ofstream& log, const std::vector<timeunits> execTimes_MacAdv, const std::vector<timeunits> execTimes_BCs);
 
 int main(){
     ofstream simlog;
@@ -131,7 +132,7 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
             if (paramName == "N" || paramName == "Nt"){
                 size_t paramValue = std::stoul(paramValueStr);
                 parameters[paramName] = paramValue;
-            } else if (paramName == "dx" || paramName == "dt"){
+            } else if (paramName == "dx" || paramName == "dt" || paramName == "D"){
                 double paramValue = std::stod(paramValueStr);
                 parameters[paramName] = paramValue;
             }
@@ -140,4 +141,8 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
     
     inputFile.close();
     return parameters;
+}
+
+void computeExecutionStatistics(ofstream& log, const std::vector<timeunits> execTimes_MacAdv, const std::vector<timeunits> execTimes_BCs){
+
 }
