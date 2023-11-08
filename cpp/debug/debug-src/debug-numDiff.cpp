@@ -48,7 +48,8 @@ int main(){
         for (size_t k = 0; k < N; k++){
             for (size_t i = 0; i < N; i++){
                 for (size_t j = 0; j < N; j++){
-                    debugOutput = NumericalDiffusion(debuglog,D,iv,i,j,k,testFluid,dx);
+                    NumericalDiffusion(debuglog,debugOutput,D,iv,i,j,k,testFluid,dx);
+                    debuglog << "~~~~~" << endl;
                 }
             }
         }
