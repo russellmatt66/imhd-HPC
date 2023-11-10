@@ -19,6 +19,8 @@ Performance metrics are obtained using calculations of the number of "floating-p
 #include <unordered_map>
 #include <variant>
 #include <chrono>
+#include <limits>
+#include <algorithm>
 
 #include "../benchmarking-include/rank3Tensor-bench.hpp"
 #include "../benchmarking-include/imhdFluid-bench.hpp"
@@ -37,7 +39,7 @@ using ParameterValue = std::variant<size_t, double, string>;
 using timeunits = std::chrono::milliseconds;
 
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
-void computeExecutionStatistics(std::ofstream& log, const std::vector<timeunits> execTimes_MacAdv, const std::vector<timeunits> execTimes_BCs);
+void computeExecutionStatistics(std::ofstream& log, const std::vector<double> execTimes_MacAdv, const std::vector<double> execTimes_BCs);
 
 int main(){
     ofstream simlog;
@@ -89,8 +91,8 @@ int main(){
 
     simlog << "Writing Initial Conditions took: " << ICs_duration.count() << " ms" << endl; 
 
-    std::vector<timeunits> executionTimes_MacCormack(Nt);
-    std::vector<timeunits> executionTimes_BCs(Nt);
+    std::vector<double> executionTimes_MacCormack(Nt);
+    std::vector<double> executionTimes_BCs(Nt);
 
     auto full_start = std::chrono::high_resolution_clock::now();
     for (size_t it = 1; it < Nt+1; it++){
@@ -98,18 +100,19 @@ int main(){
         MacCormackAdvance(screwPinchSim,dt,dx,D);
         auto stop_MacAdv = std::chrono::high_resolution_clock::now();
         auto MacAdv_duration = std::chrono::duration_cast<timeunits>(stop_MacAdv - start_MacAdv);
-        executionTimes_MacCormack[it-1] = MacAdv_duration;
+        executionTimes_MacCormack[it-1] = MacAdv_duration.count();
 
         auto start_BCs = std::chrono::high_resolution_clock::now();
         PeriodicBCs(screwPinchSim);
         auto stop_BCs = std::chrono::high_resolution_clock::now();
         auto BCs_duration = std::chrono::duration_cast<timeunits>(stop_BCs - start_BCs);
-        executionTimes_BCs[it-1] = BCs_duration;
+        executionTimes_BCs[it-1] = BCs_duration.count();
     }
     auto full_stop = std::chrono::high_resolution_clock::now();
 
     auto full_duration = std::chrono::duration_cast<timeunits>(full_stop - full_start);
     simlog << "Time taken for " << Nt << " timesteps, with " << N << " elements per side: " << full_duration.count() << " ms " << endl; 
+    computeExecutionStatistics(simlog,executionTimes_MacCormack,executionTimes_BCs);
     return 0;
 }
 
@@ -143,6 +146,67 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename){
     return parameters;
 }
 
-void computeExecutionStatistics(ofstream& log, const std::vector<timeunits> execTimes_MacAdv, const std::vector<timeunits> execTimes_BCs){
+void computeExecutionStatistics(ofstream& log, std::vector<double> execTimes_MacAdv, std::vector<double> execTimes_BCs){
+    string timeString;
+    if (std::is_same<timeunits, std::chrono::milliseconds>::value){
+        timeString = "milliseconds";
+    }
+    
+    size_t Nt = execTimes_MacAdv.size();
 
+    double meanMac = 0, medianMac = 0, stddevMac = 0, maxMac = 0, minMac = std::numeric_limits<double>::max();
+    double meanBCs = 0, medianBCs = 0, stddevBCs = 0, maxBCs = 0, minBCs = std::numeric_limits<double>::max();
+
+    // Calculate mean
+    for (size_t i = 0; i < Nt; i++){
+        meanMac += execTimes_MacAdv[i];
+        meanBCs += execTimes_BCs[i];
+        if (execTimes_MacAdv[i] > maxMac){
+            maxMac = execTimes_MacAdv[i];
+        }
+        if (execTimes_MacAdv[i] < minMac){
+            minMac = execTimes_MacAdv[i];
+        }
+        if (execTimes_BCs[i] > maxBCs){
+            maxBCs = execTimes_BCs[i];
+        }
+        if (execTimes_BCs[i] < minBCs){
+            minBCs = execTimes_BCs[i];
+        }        
+    }
+    meanMac /= Nt;
+    meanBCs /= Nt; 
+
+    // Calculate standard deviation
+    for (size_t i = 0; i < Nt; i++){
+        stddevMac = pow(execTimes_MacAdv[i] - meanMac, 2);
+        stddevBCs = pow(execTimes_BCs[i] - meanBCs, 2);
+    }
+    stddevMac = pow(stddevMac / Nt, 1/2);
+    stddevBCs = pow(stddevBCs / Nt, 1/2);
+
+    // Sort data and obtain median
+    std::sort(execTimes_MacAdv.begin(), execTimes_MacAdv.end());
+    std::sort(execTimes_BCs.begin(), execTimes_BCs.end());
+
+    if (Nt % 2) { // odd number of timesteps
+        medianMac = execTimes_MacAdv[floor(Nt / 2)];
+        medianBCs = execTimes_BCs[floor(Nt / 2)];
+    } 
+    else {
+        medianMac = 0.5 * (execTimes_MacAdv[floor(Nt / 2)] + execTimes_MacAdv[ceil(Nt / 2)]);
+        medianBCs = 0.5 * (execTimes_BCs[floor(Nt / 2)] + execTimes_BCs[ceil(Nt / 2)]);
+    }
+
+    // Stream data to log
+    log << "Average execution time of MacCormack Advance is " << meanMac << " " << timeString << endl;
+    log << "Average execution time of Boundary Conditions is " << meanBCs << " " << timeString << endl;
+    log << "Standard deviation of MacCormack Advance is " << stddevMac << " " << timeString << endl;
+    log << "Standard deviation of Boundary Conditions is " << stddevBCs << " " << timeString << endl;
+    log << "Median time of MacCormack Advance is " << medianMac << " " << timeString << endl;
+    log << "Median time of Boundary Conditions is " << medianBCs << " " << timeString << endl;
+    log << "Longest execution time for MacCormack Advance is " << maxMac << " " << timeString << endl;
+    log << "Longest execution time for Boundary Conditions is " << maxBCs << " " << timeString << endl;
+    log << "Shortest execution time for MacCormack Advance is " << minMac << " " << timeString << endl;
+    log << "Shortest execution time for Boundary Conditions is " << minBCs << " " << timeString << endl;
 }
