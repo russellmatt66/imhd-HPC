@@ -1,0 +1,16 @@
+Beginning simulation ...
+Parsing input file ...
+Total data volume = 1.34218e+08 doubles 
+Initializing 64 rank3Tensors of 128 elements per side took: 781 ms
+Writing Initial Conditions took: 28 ms
+Time taken for 100 timesteps, with 128 elements per side: 109611 ms 
+Average execution time of MacCormack Advance is 1092.81 milliseconds
+Average execution time of Boundary Conditions is 2.34 milliseconds
+Standard deviation of MacCormack Advance is 1 milliseconds
+Standard deviation of Boundary Conditions is 1 milliseconds
+Median time of MacCormack Advance is 1091 milliseconds
+Median time of Boundary Conditions is 2 milliseconds
+Longest execution time for MacCormack Advance is 1175 milliseconds
+Longest execution time for Boundary Conditions is 3 milliseconds
+Shortest execution time for MacCormack Advance is 1050 milliseconds
+Shortest execution time for Boundary Conditions is 2 milliseconds

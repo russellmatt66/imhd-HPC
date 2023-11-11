@@ -36,7 +36,7 @@ using std::get;
 using std::cerr;
 
 using ParameterValue = std::variant<size_t, double, string>;
-using timeunits = std::chrono::milliseconds;
+using timeunits = std::chrono::microseconds;
 
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 void computeExecutionStatistics(std::ofstream& log, const std::vector<double> execTimes_MacAdv, const std::vector<double> execTimes_BCs);
@@ -150,6 +150,9 @@ void computeExecutionStatistics(ofstream& log, std::vector<double> execTimes_Mac
     string timeString;
     if (std::is_same<timeunits, std::chrono::milliseconds>::value){
         timeString = "milliseconds";
+    }
+    else if (std::is_same<timeunits, std::chrono::microseconds>::value){
+        timeString = "microseconds";
     }
     
     size_t Nt = execTimes_MacAdv.size();
