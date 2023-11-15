@@ -1,0 +1,298 @@
+----- Run 1 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      12.004439934 seconds time elapsed
+
+      11.932018000 seconds user
+       0.067977000 seconds sys
+
+
+----- Run 2 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.859046329 seconds time elapsed
+
+      11.765075000 seconds user
+       0.087948000 seconds sys
+
+
+----- Run 3 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.959544725 seconds time elapsed
+
+      11.897262000 seconds user
+       0.056005000 seconds sys
+
+
+----- Run 4 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.902279749 seconds time elapsed
+
+      11.816433000 seconds user
+       0.075951000 seconds sys
+
+
+----- Run 5 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.703216625 seconds time elapsed
+
+      11.618381000 seconds user
+       0.083988000 seconds sys
+
+
+----- Run 6 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.835504331 seconds time elapsed
+
+      11.765323000 seconds user
+       0.059945000 seconds sys
+
+
+----- Run 7 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.985111056 seconds time elapsed
+
+      11.914866000 seconds user
+       0.067970000 seconds sys
+
+
+----- Run 8 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.907429400 seconds time elapsed
+
+      11.842323000 seconds user
+       0.063990000 seconds sys
+
+
+----- Run 9 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.762829031 seconds time elapsed
+
+      11.686403000 seconds user
+       0.071965000 seconds sys
+
+
+----- Run 10 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.908931996 seconds time elapsed
+
+      11.836840000 seconds user
+       0.067981000 seconds sys
+
+
+----- Run 11 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.803222432 seconds time elapsed
+
+      11.718699000 seconds user
+       0.075965000 seconds sys
+
+
+----- Run 12 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      12.017622540 seconds time elapsed
+
+      11.932481000 seconds user
+       0.083975000 seconds sys
+
+
+----- Run 13 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.709598875 seconds time elapsed
+
+      11.653480000 seconds user
+       0.051988000 seconds sys
+
+
+----- Run 14 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.904205164 seconds time elapsed
+
+      11.801721000 seconds user
+       0.095948000 seconds sys
+
+
+----- Run 15 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.738300615 seconds time elapsed
+
+      11.652585000 seconds user
+       0.079949000 seconds sys
+
+
+----- Run 16 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.728210533 seconds time elapsed
+
+      11.652201000 seconds user
+       0.071976000 seconds sys
+
+
+----- Run 17 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      12.770605623 seconds time elapsed
+
+      11.717449000 seconds user
+       0.063964000 seconds sys
+
+
+----- Run 18 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      14.356220313 seconds time elapsed
+
+      11.468930000 seconds user
+       0.099973000 seconds sys
+
+
+----- Run 19 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.649397547 seconds time elapsed
+
+      11.419498000 seconds user
+       0.063952000 seconds sys
+
+
+----- Run 20 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.552861879 seconds time elapsed
+
+      11.480403000 seconds user
+       0.067978000 seconds sys
+
+
+----- Run 21 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.597158280 seconds time elapsed
+
+      11.504700000 seconds user
+       0.087974000 seconds sys
+
+
+----- Run 22 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.910254904 seconds time elapsed
+
+      11.518264000 seconds user
+       0.071964000 seconds sys
+
+
+----- Run 23 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.579769969 seconds time elapsed
+
+      11.511080000 seconds user
+       0.063972000 seconds sys
+
+
+----- Run 24 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.698173074 seconds time elapsed
+
+      11.607721000 seconds user
+       0.087967000 seconds sys
+
+
+----- Run 25 -----
+
+ Performance counter stats for './imhd-bench':
+
+    34,151,043,473      r5301c7                                                               
+
+      11.726807196 seconds time elapsed
+
+      11.633634000 seconds user
+       0.091981000 seconds sys

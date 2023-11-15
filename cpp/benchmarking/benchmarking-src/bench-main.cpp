@@ -36,7 +36,7 @@ using std::get;
 using std::cerr;
 
 using ParameterValue = std::variant<size_t, double, string>;
-using timeunits = std::chrono::microseconds;
+using timeunits = std::chrono::milliseconds;
 
 unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 void computeExecutionStatistics(std::ofstream& log, const std::vector<double> execTimes_MacAdv, const std::vector<double> execTimes_BCs);
@@ -57,6 +57,7 @@ int main(){
     double D = get<double>(inputHash["D"]);
 
     simlog << "Total data volume = " << 64*pow(N,3) << " doubles " << endl;
+    simlog << "N = " << N;
 
     double CFL = dt / dx;
 
@@ -75,44 +76,52 @@ int main(){
         }
     }
 
-    auto start_sPSinit = std::chrono::high_resolution_clock::now();
+    // string timeString;
+    // if (std::is_same<timeunits, std::chrono::milliseconds>::value){
+    //     timeString = "milliseconds";
+    // }
+    // else if (std::is_same<timeunits, std::chrono::microseconds>::value){
+    //     timeString = "microseconds";
+    // }
+    // auto start_sPSinit = std::chrono::high_resolution_clock::now();
     imhdFluid screwPinchSim = imhdFluid(8, N); 
-    auto stop_sPSinit = std::chrono::high_resolution_clock::now();
-    auto sPSinit_duration = std::chrono::duration_cast<timeunits>(stop_sPSinit - start_sPSinit);
+    // auto stop_sPSinit = std::chrono::high_resolution_clock::now();
+    // auto sPSinit_duration = std::chrono::duration_cast<timeunits>(stop_sPSinit - start_sPSinit);
 
-    simlog << "Initializing 64 rank3Tensors of " << N << " elements per side took: " << sPSinit_duration.count() << " ms" << endl;
+    // simlog << "Initializing 64 rank3Tensors of " << N << " elements per side took: " << sPSinit_duration.count() << timeString << endl;
 
     double gamma = screwPinchSim.getGamma(); 
     
-    auto start_ICs = std::chrono::high_resolution_clock::now();
+    // auto start_ICs = std::chrono::high_resolution_clock::now();
     InitialConditions(screwPinchSim, ComputationalVolume, L);
-    auto stop_ICs = std::chrono::high_resolution_clock::now();
-    auto ICs_duration = std::chrono::duration_cast<timeunits>(stop_ICs - start_ICs);
+    // auto stop_ICs = std::chrono::high_resolution_clock::now();
+    // auto ICs_duration = std::chrono::duration_cast<timeunits>(stop_ICs - start_ICs);
 
-    simlog << "Writing Initial Conditions took: " << ICs_duration.count() << " ms" << endl; 
+    // simlog << "Writing Initial Conditions took: " << ICs_duration.count() << timeString << endl; 
 
-    std::vector<double> executionTimes_MacCormack(Nt);
-    std::vector<double> executionTimes_BCs(Nt);
+    // std::vector<double> executionTimes_MacCormack(Nt);
+    // std::vector<double> executionTimes_BCs(Nt);
 
-    auto full_start = std::chrono::high_resolution_clock::now();
+    // auto full_start = std::chrono::high_resolution_clock::now();
     for (size_t it = 1; it < Nt+1; it++){
-        auto start_MacAdv = std::chrono::high_resolution_clock::now();
+        // auto start_MacAdv = std::chrono::high_resolution_clock::now();
         MacCormackAdvance(screwPinchSim,dt,dx,D);
-        auto stop_MacAdv = std::chrono::high_resolution_clock::now();
-        auto MacAdv_duration = std::chrono::duration_cast<timeunits>(stop_MacAdv - start_MacAdv);
-        executionTimes_MacCormack[it-1] = MacAdv_duration.count();
+        // auto stop_MacAdv = std::chrono::high_resolution_clock::now();
+        // auto MacAdv_duration = std::chrono::duration_cast<timeunits>(stop_MacAdv - start_MacAdv);
+        // executionTimes_MacCormack[it-1] = MacAdv_duration.count();
 
-        auto start_BCs = std::chrono::high_resolution_clock::now();
+        // auto start_BCs = std::chrono::high_resolution_clock::now();
         PeriodicBCs(screwPinchSim);
-        auto stop_BCs = std::chrono::high_resolution_clock::now();
-        auto BCs_duration = std::chrono::duration_cast<timeunits>(stop_BCs - start_BCs);
-        executionTimes_BCs[it-1] = BCs_duration.count();
+        // auto stop_BCs = std::chrono::high_resolution_clock::now();
+        // auto BCs_duration = std::chrono::duration_cast<timeunits>(stop_BCs - start_BCs);
+        // executionTimes_BCs[it-1] = BCs_duration.count();
     }
-    auto full_stop = std::chrono::high_resolution_clock::now();
+    // auto full_stop = std::chrono::high_resolution_clock::now();
 
-    auto full_duration = std::chrono::duration_cast<timeunits>(full_stop - full_start);
-    simlog << "Time taken for " << Nt << " timesteps, with " << N << " elements per side: " << full_duration.count() << " ms " << endl; 
-    computeExecutionStatistics(simlog,executionTimes_MacCormack,executionTimes_BCs);
+    // auto full_duration = std::chrono::duration_cast<timeunits>(full_stop - full_start);
+    // simlog << "Time taken for " << Nt << " timesteps, with " << N << " elements per side: " << full_duration.count() << timeString << endl; 
+    // computeExecutionStatistics(simlog,executionTimes_MacCormack,executionTimes_BCs);
+    simlog << "Halting program and returning control " << endl;
     return 0;
 }
 
