@@ -1,13 +1,15 @@
+CPU: i7-10510U CPU @ 1.80GHz
+RAM: 8GB
 ----- Run 1 -----
 
  Performance counter stats for './imhd-bench':
 
    291,851,119,121      r5301c7                                                               
 
-     104.592344384 seconds time elapsed
+      87.117894224 seconds time elapsed
 
-     103.553787000 seconds user
-       0.579875000 seconds sys
+      86.797597000 seconds user
+       0.320005000 seconds sys
 
 
 ----- Run 2 -----
@@ -16,10 +18,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     102.327765232 seconds time elapsed
+      89.798188507 seconds time elapsed
 
-     101.659683000 seconds user
-       0.611877000 seconds sys
+      89.492359000 seconds user
+       0.308015000 seconds sys
 
 
 ----- Run 3 -----
@@ -28,10 +30,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     101.925883198 seconds time elapsed
+      88.648326509 seconds time elapsed
 
-     101.033468000 seconds user
-       0.831748000 seconds sys
+      88.382152000 seconds user
+       0.268006000 seconds sys
 
 
 ----- Run 4 -----
@@ -40,10 +42,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     101.507778720 seconds time elapsed
+      89.170867968 seconds time elapsed
 
-     100.820410000 seconds user
-       0.555869000 seconds sys
+      88.910795000 seconds user
+       0.260008000 seconds sys
 
 
 ----- Run 5 -----
@@ -52,10 +54,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     101.738570229 seconds time elapsed
+      89.567509902 seconds time elapsed
 
-     100.912935000 seconds user
-       0.779914000 seconds sys
+      89.262812000 seconds user
+       0.304009000 seconds sys
 
 
 ----- Run 6 -----
@@ -64,10 +66,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     101.921037559 seconds time elapsed
+      89.158595290 seconds time elapsed
 
-     101.133901000 seconds user
-       0.643630000 seconds sys
+      88.839589000 seconds user
+       0.315984000 seconds sys
 
 
 ----- Run 7 -----
@@ -76,10 +78,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     102.087412859 seconds time elapsed
+      89.372778055 seconds time elapsed
 
-     100.195051000 seconds user
-       0.579763000 seconds sys
+      89.101020000 seconds user
+       0.272003000 seconds sys
 
 
 ----- Run 8 -----
@@ -88,10 +90,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     100.543753496 seconds time elapsed
+      89.581669468 seconds time elapsed
 
-      99.902055000 seconds user
-       0.547835000 seconds sys
+      89.287048000 seconds user
+       0.283984000 seconds sys
 
 
 ----- Run 9 -----
@@ -100,10 +102,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     104.416552671 seconds time elapsed
+      89.841164172 seconds time elapsed
 
-     103.696935000 seconds user
-       0.631688000 seconds sys
+      89.498944000 seconds user
+       0.327966000 seconds sys
 
 
 ----- Run 10 -----
@@ -112,10 +114,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     100.468405318 seconds time elapsed
+      86.927372361 seconds time elapsed
 
-      99.742579000 seconds user
-       0.691851000 seconds sys
+      86.628144000 seconds user
+       0.292027000 seconds sys
 
 
 ----- Run 11 -----
@@ -124,10 +126,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     100.065919132 seconds time elapsed
+      89.526111472 seconds time elapsed
 
-      99.147502000 seconds user
-       0.659890000 seconds sys
+      89.224199000 seconds user
+       0.292026000 seconds sys
 
 
 ----- Run 12 -----
@@ -136,10 +138,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     102.705601874 seconds time elapsed
+      89.765867243 seconds time elapsed
 
-     101.915026000 seconds user
-       0.647790000 seconds sys
+      89.465750000 seconds user
+       0.295992000 seconds sys
 
 
 ----- Run 13 -----
@@ -148,10 +150,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     100.924726427 seconds time elapsed
+      89.069571181 seconds time elapsed
 
-     100.130857000 seconds user
-       0.615697000 seconds sys
+      88.772432000 seconds user
+       0.295988000 seconds sys
 
 
 ----- Run 14 -----
@@ -160,10 +162,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-      99.709118131 seconds time elapsed
+      88.940859348 seconds time elapsed
 
-      99.007740000 seconds user
-       0.675834000 seconds sys
+      88.652352000 seconds user
+       0.287988000 seconds sys
 
 
 ----- Run 15 -----
@@ -172,10 +174,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     104.599031004 seconds time elapsed
+      88.877980015 seconds time elapsed
 
-     100.101845000 seconds user
-       0.695734000 seconds sys
+      88.577491000 seconds user
+       0.287965000 seconds sys
 
 
 ----- Run 16 -----
@@ -184,10 +186,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     100.730833930 seconds time elapsed
+      88.524020523 seconds time elapsed
 
-     100.059114000 seconds user
-       0.643865000 seconds sys
+      88.203239000 seconds user
+       0.307955000 seconds sys
 
 
 ----- Run 17 -----
@@ -196,10 +198,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     113.150934563 seconds time elapsed
+      90.210597102 seconds time elapsed
 
-      99.813682000 seconds user
-       0.811916000 seconds sys
+      89.832599000 seconds user
+       0.343986000 seconds sys
 
 
 ----- Run 18 -----
@@ -208,10 +210,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-      99.841721180 seconds time elapsed
+      87.745034643 seconds time elapsed
 
-      99.045744000 seconds user
-       0.687734000 seconds sys
+      87.415242000 seconds user
+       0.319967000 seconds sys
 
 
 ----- Run 19 -----
@@ -220,10 +222,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     103.296659031 seconds time elapsed
+      87.354863926 seconds time elapsed
 
-     101.752344000 seconds user
-       1.267356000 seconds sys
+      87.071038000 seconds user
+       0.275971000 seconds sys
 
 
 ----- Run 20 -----
@@ -232,10 +234,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     114.090432487 seconds time elapsed
+      87.734101874 seconds time elapsed
 
-     108.192282000 seconds user
-       1.375037000 seconds sys
+      87.407937000 seconds user
+       0.307999000 seconds sys
 
 
 ----- Run 21 -----
@@ -244,10 +246,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     104.132531120 seconds time elapsed
+      87.567537073 seconds time elapsed
 
-     103.123846000 seconds user
-       0.659564000 seconds sys
+      87.229587000 seconds user
+       0.323961000 seconds sys
 
 
 ----- Run 22 -----
@@ -256,10 +258,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     101.591800194 seconds time elapsed
+      87.268859534 seconds time elapsed
 
-     100.882319000 seconds user
-       0.664015000 seconds sys
+      86.941505000 seconds user
+       0.319990000 seconds sys
 
 
 ----- Run 23 -----
@@ -268,10 +270,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     102.035365927 seconds time elapsed
+      86.926189261 seconds time elapsed
 
-     101.454355000 seconds user
-       0.575967000 seconds sys
+      86.620280000 seconds user
+       0.299987000 seconds sys
 
 
 ----- Run 24 -----
@@ -280,10 +282,10 @@
 
    291,851,119,121      r5301c7                                                               
 
-     102.155602912 seconds time elapsed
+      89.248738565 seconds time elapsed
 
-     101.485562000 seconds user
-       0.619862000 seconds sys
+      88.943920000 seconds user
+       0.299999000 seconds sys
 
 
 ----- Run 25 -----
@@ -292,9 +294,9 @@
 
    291,851,119,121      r5301c7                                                               
 
-     101.555440298 seconds time elapsed
+      86.699964495 seconds time elapsed
 
-     100.539315000 seconds user
-       0.835828000 seconds sys
+      86.394871000 seconds user
+       0.299982000 seconds sys
 
 
