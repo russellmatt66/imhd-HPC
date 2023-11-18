@@ -1,0 +1,1 @@
+This is the build folder for the debug version of the C project. 

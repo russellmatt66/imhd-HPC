@@ -1,8 +1,15 @@
-cpp/.vscode
 .vscode/
+.vs/
+
+cpp/.vscode
 cpp/build/*
 cpp/data/*
+cpp/src/out/
 cpp/debug/debug-data/*
 cpp/debug/debug-build/*
+cpp/debug/debug-src/out
 cpp/benchmarking/benchmarking-build/*
+cpp/benchmarking/benchmarking-src/out/
 cpp/test/test-build/*
+cpp/test/test-src/out
+

@@ -10,10 +10,16 @@ Development of the C++ version of the code is nearing completion.
 - Debug the boundary conditions, and tune the numerical diffusion coefficient.
 
 ## C
-Development of the C version of the code has not yet begun.
+Development of the C version of the code has begun.
+**Current Tasks:**
+- Write the rank-3 tensor class.
 
 ## Fortran
-Development of the Fortran version of the code has not yet begun.
+Development of the Fortran version of the code has begun.
+**Current Tasks:**
+- Establish directory structure.
 
 ## Rust
-Development of the Rust version of the code has not yet begun.
+Development of the Rust version of the code has begun.
+**Current Tasks:**
+- Establish directory structure.
