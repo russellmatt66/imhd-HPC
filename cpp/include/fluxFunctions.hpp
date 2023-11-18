@@ -9,7 +9,9 @@ void computefluxes_x(imhdFluid& imhdFluid) {
     double p, BdotB, Bdotv;
     double rho, rho_u, rho_v, rho_w, B_x, B_y, B_z, e;
     size_t N = imhdFluid.getSideLen();
-    for (size_t k = 0; k < N; k++){ // This is the fastest way to scan through rank3Tensor class
+    
+    // This nested loop ordering is the fastest way to scan through rank3Tensor class
+    for (size_t k = 0; k < N; k++){ 
         for (size_t i = 0; i < N; i++){
             for (size_t j = 0; j < N; j++){
                 // Hoisting reduces the number of memory accesses each loop, and increases readability
@@ -57,7 +59,8 @@ void computefluxes_y(imhdFluid& imhdFluid){
     double p, BdotB, Bdotv;
     double rho, rho_u, rho_v, rho_w, B_x, B_y, B_z, e;
     size_t N = imhdFluid.getSideLen();
-    for (size_t k = 0; k < N; k++){ // This is the fastest way to scan through rank3Tensor class
+
+    for (size_t k = 0; k < N; k++){ 
         for (size_t i = 0; i < N; i++){
             for (size_t j = 0; j < N; j++){
                 // Hoisting reduces the number of memory accesses each loop, and increases readability
@@ -105,7 +108,8 @@ void computefluxes_z(imhdFluid& imhdFluid){
     double p, BdotB, Bdotv;
     double rho, rho_u, rho_v, rho_w, B_x, B_y, B_z, e;
     size_t N = imhdFluid.getSideLen();
-    for (size_t k = 0; k < N; k++){ // This is the fastest way to scan through rank3Tensor class
+
+    for (size_t k = 0; k < N; k++){ 
         for (size_t i = 0; i < N; i++){
             for (size_t j = 0; j < N; j++){
                 // Hoisting reduces the number of memory accesses each loop, and increases readability
@@ -154,7 +158,8 @@ void int_computefluxes_x(imhdFluid& imhdFluid){
     double p, BdotB, Bdotv;
     double rho, rho_u, rho_v, rho_w, B_x, B_y, B_z, e;
     size_t N = imhdFluid.getSideLen();
-    for (size_t k = 0; k < N; k++){ // This is the fastest way to scan through rank3Tensor class
+
+    for (size_t k = 0; k < N; k++){ 
         for (size_t i = 0; i < N; i++){
             for (size_t j = 0; j < N; j++){
                 // Hoisting reduces the number of memory accesses each loop, and increases readability
@@ -203,7 +208,8 @@ void int_computefluxes_y(imhdFluid& imhdFluid){
     double p, BdotB, Bdotv;
     double rho, rho_u, rho_v, rho_w, B_x, B_y, B_z, e;
     size_t N = imhdFluid.getSideLen();
-    for (size_t k = 0; k < N; k++){ // This is the fastest way to scan through rank3Tensor class
+
+    for (size_t k = 0; k < N; k++){ 
         for (size_t i = 0; i < N; i++){
             for (size_t j = 0; j < N; j++){
                 // Hoisting reduces the number of memory accesses each loop, and increases readability
@@ -251,7 +257,8 @@ void int_computefluxes_z(imhdFluid& imhdFluid){
     double p, BdotB, Bdotv;
     double rho, rho_u, rho_v, rho_w, B_x, B_y, B_z, e;
     size_t N = imhdFluid.getSideLen();
-    for (size_t k = 0; k < N; k++){ // This is the fastest way to scan through rank3Tensor class
+
+    for (size_t k = 0; k < N; k++){ 
         for (size_t i = 0; i < N; i++){
             for (size_t j = 0; j < N; j++){
                 // Hoisting reduces the number of memory accesses each loop, and increases readability

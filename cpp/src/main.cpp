@@ -16,7 +16,6 @@
 #include "../include/numerics.hpp"
 #include "../include/fluxFunctions.hpp"
 
-// Don't want to use "using namespace std;"
 using std::string;
 using std::ofstream;
 using std::ifstream;
@@ -89,7 +88,6 @@ int main(){
     simlog << "Screw-pinch gamma is " << gamma << endl;
 
     // Initial Conditions
-    // Currently there is a seg fault inside here
     InitialConditions(screwPinchSim, ComputationalVolume, L);
     simlog << "Screw-pinch successfully initialized.\n";
 

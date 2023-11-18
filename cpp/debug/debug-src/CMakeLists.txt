@@ -24,10 +24,12 @@ INCLUDE_DIRECTORIES (${HDF5_INCLUDE_DIR})
 # executable for debugging ICs and createHDF5File() 
 # add_executable (debug-ICs debug-ICs.cpp)
 
-add_executable(debug-numDiff debug-numDiff.cpp)
+# Executable for debugging NumericalDiffusion()
+# add_executable(debug-numDiff debug-numDiff.cpp)
 
-target_link_libraries (debug-numDiff PRIVATE ${LINK_LIBS} stdc++fs)
+add_executable(imhd-debug debug-main.cpp)
+target_compile_options(imhd-debug PRIVATE -O3 -g -Wall)
+target_link_libraries(debug-main PRIVATE ${LINK_LIBS} stdc++fs)
 
-# Release binary
-# add_executable(imhd-debug debug-main.cpp)
+
 

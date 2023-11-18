@@ -11,7 +11,7 @@ class rank3Tensor {
 		double& operator()(size_t i, size_t j, size_t k) { return storage_[k * num_rows_* num_cols_ + i * num_cols_ + j]; }
 		const double& operator()(size_t i, size_t j, size_t k) const { return storage_[k * num_rows_* num_cols_ + i * num_cols_ + j]; }	
 	
-		const std::vector<double>& get_storage() const { return storage_; }
+		const std::vector<double>& get_storage() { return storage_; }
 
 		const size_t num_rows() const { return num_rows_; }
 		const size_t num_cols() const { return num_cols_; }

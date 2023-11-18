@@ -8,7 +8,7 @@ High-Performance scientific computing project that solves a conservative form of
 
 `include/` - The library functions are in here.
 
-`data/` - The data from each run, in the form of .h5 files, appears in here. **This directory is necessary for the code to operate**, so I pushed it to Github. At the beginning of each run, all the files from this folder are removed. Currently, there is only a single .h5 file located inside the directory. This is a placeholder file from the point in the project when I was debugging a segfault in the creation of the data files, so it will not render correctly in VisIt.   
+`data/` - The data from each run, in the form of .h5 files, appears in here. **This directory is necessary for the code to operate**, so I pushed it to Github. At the beginning of each run, all the files from this folder are removed, except for the README in there.
 
 `benchmarking/` - All of the code written for benchmarking the project is contained in here. When I wrote the code in here, my understanding of benchmarking was limited to how to measure FLOPs for a program compiled without optimization flags. After completing the project (well, the numerical dffusion coefficient still needs to be tuned), I researched how to use hardware performance monitoring events to measure FLOPs, instead. This way is more accurate, but the code that I wrote before understanding how to perform it is full of logging time measurements, and computing statistics, so there's some non-trivial overhead. 
 

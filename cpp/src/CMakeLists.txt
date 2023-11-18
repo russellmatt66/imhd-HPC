@@ -21,9 +21,6 @@ else ()
 endif ()
 INCLUDE_DIRECTORIES (${HDF5_INCLUDE_DIR})
 
-
-
 add_executable (imhd-release main.cpp)
-
 target_link_libraries(imhd-release PRIVATE ${LINK_LIBS} stdc++fs)
 target_compile_options(imhd-release PRIVATE -O3 -Wall)

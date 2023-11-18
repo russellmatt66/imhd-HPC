@@ -20,7 +20,7 @@ class imhdFluid {
 			int_zFluxes_(numVars, rank3Tensor(N))
             {}
         
-        // Spaghetti for accessing all the member variables beyond this point.
+        // Boilerplate for accessing all the member variables beyond this point.
         // In scientific software development, there is a tradeoff between elegance and correctness that must sometimes be made. 
         // It is far more important that the code be easy to debug, than that it be the cleverest, most compact set of statements ever written. 
          
@@ -268,7 +268,7 @@ class imhdFluid {
         }
 
         double pressure(size_t i, size_t j, size_t k){
-            return (gamma - 1)*(variables_[7](i,j,k) - variables_[0](i,j,k)*v_dot_v(i,j,k) / 2.0 
+            return (gamma - 1.0)*(variables_[7](i,j,k) - variables_[0](i,j,k)*v_dot_v(i,j,k) / 2.0 
 				- B_dot_B(i,j,k) / 2.0);
         }    
 

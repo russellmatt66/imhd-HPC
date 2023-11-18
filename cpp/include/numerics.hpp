@@ -131,14 +131,14 @@ void MacCormackAdvance(imhdFluid& imhdFluid, const double dt, const double dx, c
                             - 0.5 * (dt / dx) * (imhdFluid.int_xfluxes(iv,i+1,j,N-1) - imhdFluid.int_xfluxes(iv,i,j,N-1)) 
                             - 0.5 * (dt / dy) * (imhdFluid.int_yfluxes(iv,i,j+1,N-1) - imhdFluid.int_yfluxes(iv,i,j,N-1))
                             - 0.5 * (dt / dz) * (imhdFluid.int_zfluxes(iv,i,j,N-1) - imhdFluid.int_zfluxes(iv,i,j,1)) 
-                            - D*(diffVector.x() + diffVector.y() + diffVector.z());
+                            + D*(diffVector.x() + diffVector.y() + diffVector.z());
                     }
                     else {
                         imhdFluid.imhdVar(iv,i,j,k) = 0.5 * (imhdFluid.imhdVar(iv,i,j,k) - imhdFluid.intermediateVar(iv,i,j,k))
                             - 0.5 * (dt / dx) * (imhdFluid.int_xfluxes(iv,i+1,j,k) - imhdFluid.int_xfluxes(iv,i,j,k)) 
                             - 0.5 * (dt / dy) * (imhdFluid.int_yfluxes(iv,i,j+1,k) - imhdFluid.int_yfluxes(iv,i,j,k))
                             - 0.5 * (dt / dz) * (imhdFluid.int_zfluxes(iv,i,j,k) - imhdFluid.int_zfluxes(iv,i,j,k+1))
-                            - D*(diffVector.x() + diffVector.y() + diffVector.z());
+                            + D*(diffVector.x() + diffVector.y() + diffVector.z());
                     }
 
                 }

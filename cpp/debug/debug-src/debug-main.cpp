@@ -8,7 +8,7 @@
 #include<unordered_map>
 #include<variant>
 
-#include<H5cpp.h> 
+#include<H5Cpp.h> 
 
 #include "../debug-include/rank3Tensor-debug.hpp"
 #include "../debug-include/imhdFluid-debug.hpp"
@@ -35,17 +35,18 @@ unordered_map<string, ParameterValue> parseInputFile(const string& filename);
 // Main
 int main(){
     ofstream simlog;
-    simlog.open("../debug-build/logs/debug.log");
+    simlog.open("../build/imhd.log");
     simlog << "Beginning simulation ...\n";
 
     // Parse input file
     simlog << "Parsing input file ...\n";
-    unordered_map<string, ParameterValue> inputHash = parseInputFile("../debug-build/imhd.inp");
+    unordered_map<string, ParameterValue> inputHash = parseInputFile("../build/imhd.inp");
 
     size_t N = get<size_t>(inputHash["N"]);
     size_t Nt = get<size_t>(inputHash["Nt"]);
     double dx = get<double>(inputHash["dx"]);
     double dt = get<double>(inputHash["dt"]);
+    double D = get<double>(inputHash["D"]);
 
     simlog << "N = " << N << endl;
     simlog << "Nt = " << Nt << endl;
@@ -54,9 +55,9 @@ int main(){
     simlog << "Initializing timestep, and grid spacing.\n";
     double CFL = dt / dx;
 
-    simlog << "dx = " << endl;
-    simlog << "dt = " << endl;
-    simlog << "CFL = " << endl;
+    simlog << "dx = " << dx << endl;
+    simlog << "dt = " << dt << endl;
+    simlog << "CFL = " << CFL << endl;
 
     simlog << "Initializing Cartesian grid.\n";
     cartesianGrid ComputationalVolume = cartesianGrid(N);
@@ -82,62 +83,41 @@ int main(){
     // + 8 rank-3 tensors containing the intermediate variables (required by MacCormack method)
     // + 24 containing the intermediate fluxes
     imhdFluid screwPinchSim = imhdFluid(8, N); 
-
-    double r, r_pinch = 0.5 * (L / 2), gamma = screwPinchSim.getGamma(); // d_pinch = L / 2
-    simlog << "screw-pinch gamma is " << gamma << endl;
+    double gamma = screwPinchSim.getGamma(); 
+    simlog << "Screw-pinch gamma is " << gamma << endl;
 
     // Initial Conditions
-    // Currently there is a seg fault inside here
-    // First order of business is to create a wrapper around this
-    for (size_t k = 0; k < ComputationalVolume.num_depth(); k++){
-        for (size_t i = 0; i < ComputationalVolume.num_rows(); i++){
-            for (size_t j = 0; j < ComputationalVolume.num_cols(); j++){
-                r = ComputationalVolume(i,j,k).r_cyl();
-                if (r < r_pinch) { // Inside pinch
-                    screwPinchSim.rho(i,j,k) = 1.0; // single mass unit 
-                    screwPinchSim.Bz(i,j,k) = 1.0; 
-                    screwPinchSim.rho_w(i,j,k) = 1.0 - pow(r,2) / pow(r_pinch,2);
-                    screwPinchSim.e(i,j,k) = 1.0 / (gamma - 1.0) + 
-                        0.5 * screwPinchSim.rho(i,j,k) * screwPinchSim.v_dot_v(i,j,k) + 
-                        0.5 * screwPinchSim.B_dot_B(i,j,k);
-                }
-                else {
-                    screwPinchSim.rho(i,j,k) = 0.01; // "vacuum"
-                    screwPinchSim.e(i,j,k) = 0.0 + 
-                        0.5 * screwPinchSim.rho(i,j,k) * screwPinchSim.v_dot_v(i,j,k) + 
-                        0.5 * screwPinchSim.B_dot_B(i,j,k); // p_vac = 0.0
-                }
-            }
-        }
-    }
+    InitialConditions(screwPinchSim, ComputationalVolume, L);
     simlog << "Screw-pinch successfully initialized.\n";
 
     // For creating HDF5 files and holding return value
-    const string dataPath = "../debug-data"; 
-    string filePath; 
-    bool fileFlag;
+    // const string dataPath = "../data"; 
+    // string filePath; 
+    // bool fileFlag;
 
-    // Clear data directory of all files before beginning simulation
-    clearDataDirectory(dataPath);
+    // // Clear data directory of all files before beginning simulation
+    // simlog << "Clearing data files from " << dataPath << endl;
+    // clearDataDirectory(dataPath);
+    // simlog << "Data files successfully cleared " << endl;
 
     // Write ICs
-    simlog << "Writing Initial Conditions.\n";
-    filePath = dataPath + "/FluidVars_timestep_0.h5";
-    fileFlag = createHDF5File(screwPinchSim,ComputationalVolume,filePath);
-    simlog << "Initial Conditions successfully written.\n";
+    // simlog << "Writing Initial Conditions to data.\n";
+    // filePath = "../data/FluidVars_timestep_0.h5";
+    // fileFlag = createHDF5File(screwPinchSim,ComputationalVolume,filePath);
+    // simlog << "Initial Conditions successfully written to data.\n";
 
     // Fluid (MacCormack) Advance
     simlog << "Beginning time advance.\n";
     for (size_t it = 1; it < Nt+1; it++){
         simlog << "Beginning timestep " << it << endl;
-        MacCormackAdvance(screwPinchSim,dt,dx);
+        MacCormackAdvance(screwPinchSim,dt,dx,D);
         simlog << "Advance completed. Writing boundary conditions\n";
         PeriodicBCs(screwPinchSim);
         simlog << "Boundary conditions written.\n";
-        filePath = dataPath + "/FluidVars" + "_timestep_" + to_string(it) + ".h5";  
-        simlog << "Writing data to file " << filePath << endl;
-        fileFlag = createHDF5File(screwPinchSim,ComputationalVolume,filePath);
-        simlog << "Data successfully written out.\n";
+        // filePath = dataPath + "/FluidVars" + "_timestep_" + std::to_string(it) + ".h5";  
+        // simlog << "Writing data to file " << filePath << endl;
+        // fileFlag = createHDF5File(screwPinchSim,ComputationalVolume,filePath);
+        // simlog << "Data successfully written out.\n";
     }
 
     // Close log and halt
