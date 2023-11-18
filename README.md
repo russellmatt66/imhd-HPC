@@ -5,8 +5,9 @@ This is a sequential code that achieves performance on par with the Cray-2 by ac
 
 # C++
 Development of the C++ version of the code is nearing completion. 
+
 Current Tasks:
-o Debug the boundary conditions, and tune the numerical diffusion coefficient.
+- Debug the boundary conditions, and tune the numerical diffusion coefficient.
 
 ## C
 Development of the C version of the code has not yet begun.
